@@ -1,13 +1,13 @@
 #include "DriverManager.hpp"
 
 DriverManager::DriverManager() {
-    drivers_array[D_WIFI] = new WifiDriver();
+    drivers_array[D_WIFI] = &wifiDriver;
 }
 
 ErrorCode DriverManager::initAllDrivers() {
-    for(Driver *driver : drivers_array) {
-        if(nullptr != driver) {
-            driver->init();
+    for(int driverIndex = 0; driverIndex < DRIVERS_NUMBER; driverIndex++) {
+        if(nullptr != drivers_array[driverIndex]) {
+            drivers_array[driverIndex]->init();
         }
         else {
             return E_NOT_OK;
@@ -17,10 +17,10 @@ ErrorCode DriverManager::initAllDrivers() {
 }
 
 ErrorCode DriverManager::deinitAllDrivers() {
-    
-    for(Driver *driver : drivers_array) {
-        if(nullptr != driver) {
-            driver->deinit();
+
+    for(int driverIndex = 0; driverIndex < DRIVERS_NUMBER; driverIndex++) {
+        if(nullptr != drivers_array[driverIndex]) {
+            drivers_array[driverIndex]->deinit();
         }
         else {
             return E_NOT_OK;
@@ -30,9 +30,9 @@ ErrorCode DriverManager::deinitAllDrivers() {
 }
 
 ErrorCode DriverManager::startAllDrivers() {
-    for(Driver *driver : drivers_array) {
-        if(nullptr != driver) {
-            driver->start();
+    for(int driverIndex = 0; driverIndex < DRIVERS_NUMBER; driverIndex++) {
+        if(nullptr != drivers_array[driverIndex]) {
+            drivers_array[driverIndex]->start();
         }
         else {
             return E_NOT_OK;
@@ -42,9 +42,9 @@ ErrorCode DriverManager::startAllDrivers() {
 }
 
 ErrorCode DriverManager::stopAllDrivers() {
-    for(Driver *driver : drivers_array) {
-        if(nullptr != driver) {
-            driver->stop();
+    for(int driverIndex = 0; driverIndex < DRIVERS_NUMBER; driverIndex++) {
+        if(nullptr != drivers_array[driverIndex]) {
+            drivers_array[driverIndex]->stop();
         }
         else {
             return E_NOT_OK;
@@ -54,7 +54,5 @@ ErrorCode DriverManager::stopAllDrivers() {
 }
 
 DriverManager::~DriverManager() {
-    for(Driver *driver : drivers_array) {
-        delete driver;
-    }
+
 }

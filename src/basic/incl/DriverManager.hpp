@@ -16,6 +16,7 @@ class DriverManager {
     ErrorCode stopAllDrivers();
 
     private:
+    WifiDriver wifiDriver;
     Driver* drivers_array[DRIVERS_NUMBER];
 
 };
