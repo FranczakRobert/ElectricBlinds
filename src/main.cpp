@@ -4,10 +4,10 @@ DriverManager driverManager;
 
 void setup() {
   Serial.begin(9600);
-
   driverManager.startAllDrivers();
 }
 
 void loop() {
-  ESP32Server::GetInstance()->start();
+  Serial.print(".");
+  vTaskDelay(1000);
 }

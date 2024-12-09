@@ -10,12 +10,13 @@ class DriverManager {
     DriverManager();
     ~DriverManager();
     
-    ErrorCode initAllDrivers();
-    ErrorCode deinitAllDrivers();
     ErrorCode startAllDrivers();
     ErrorCode stopAllDrivers();
 
     private:
+    ErrorCode initAllDrivers();
+    ErrorCode deinitAllDrivers();
+    
     WifiDriver wifiDriver;
     Driver* drivers_array[DRIVERS_NUMBER];
 

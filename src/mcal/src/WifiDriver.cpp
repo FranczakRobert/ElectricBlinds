@@ -10,6 +10,10 @@ WifiDriver::~WifiDriver() {
 }
 
 ErrorCode WifiDriver::init() {
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+  WiFi.begin(ssid, password);
+  delay(5000);
   return E_OK;
 }
 
@@ -30,20 +34,11 @@ ErrorCode WifiDriver::deinit() {
 }
 
 ErrorCode WifiDriver::stop() {
-  wl_status_t wifiStatus = WiFi.status();
-
-  if(WL_CONNECTED == wifiStatus) {
-    WiFi.disconnect();
-  }
-  return E_OK;
+  return deinit();
 }
 
 ErrorCode WifiDriver::start() {
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
-  delay(5000);
-  
+  init();
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");

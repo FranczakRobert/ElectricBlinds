@@ -14,6 +14,7 @@ ErrorCode DriverManager::initAllDrivers() {
             return E_NOT_OK;
         }
     }
+    Serial.println("Init performed...");
     return E_OK;
 }
 
@@ -42,7 +43,7 @@ ErrorCode DriverManager::startAllDrivers() {
             return E_NOT_OK;
         }
     }
-    ESP32Server::GetInstance()->init();
+    ESP32Server::GetInstance()->start();
 
     return E_OK;
 }
@@ -59,6 +60,8 @@ ErrorCode DriverManager::stopAllDrivers() {
 
     deinitAllDrivers();
     
+    ESP32Server::GetInstance()->stop();
+
     return E_OK;
 }
 

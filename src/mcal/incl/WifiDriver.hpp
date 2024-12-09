@@ -10,10 +10,12 @@ class WifiDriver : public Driver {
     WifiDriver();
     ~WifiDriver();
     
-    ErrorCode init() override;
-    ErrorCode deinit() override;
     ErrorCode start() override;
     ErrorCode stop() override;
+
+    private:
+    ErrorCode init() override;
+    ErrorCode deinit() override;
 
 };
 

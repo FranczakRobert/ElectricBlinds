@@ -2,14 +2,21 @@
 #include <WebServer.h>
 #include "ESP32Server.hpp"
 #include <ArduinoJson.h>
-#include "FreeRTOSManager.hpp"
 
 WebServer ESP32Server::server(8080);
 ESP32Server* ESP32Server::instance = nullptr;
-FreeRTOSManager freeRTOSManager;
+TaskHandle_t xHandle = NULL;
 
 ESP32Server::ESP32Server() {
+  
   /* SINGLETON */
+}
+
+ESP32Server* ESP32Server::GetInstance() {
+  if(instance == nullptr) {
+    instance = new ESP32Server();
+  }
+  return instance;
 }
 
 void ESP32Server::handleRoot()
@@ -95,18 +102,22 @@ ErrorCode ESP32Server::deinit() {
 }
 
 ErrorCode ESP32Server::start() {
-  ESP32Server::server.handleClient();  
+  init();
+  xTaskCreate(runWrapper,"Server",2048,NULL,1,&xHandle);
   return E_OK;
 }
 
 ErrorCode ESP32Server::stop() {
-  ESP32Server::server.stop();
+  vTaskDelete(xHandle);
+  deinit();
   return E_OK;
 }
 
-ESP32Server* ESP32Server::GetInstance() {
-  if(instance == nullptr) {
-    instance = new ESP32Server();
-  }
-  return instance;
+void ESP32Server::runWrapper(void *params) {
+  ESP32Server::GetInstance()->run();
+}
+
+void ESP32Server::run() {
+  ESP32Server::server.handleClient();
+  vTaskDelay(1);
 }

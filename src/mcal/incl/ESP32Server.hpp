@@ -16,17 +16,22 @@ class ESP32Server : public Driver {
 
     static void handleRoot();
     static void handlePost();
+    static void runWrapper(void *params);
 
-    public:
+    private:
     ErrorCode init() override;
     ErrorCode deinit() override;
+
+    public:
+    static ESP32Server* GetiInstance();
+
     ErrorCode start() override;
     ErrorCode stop() override;
+    void run();
 
-    static ESP32Server* GetInstance();
     ESP32Server(ESP32Server &other) = delete;
     void operator=(const ESP32Server &) = delete;
-
+    
 };
 
 #endif // SERVER_HPP
