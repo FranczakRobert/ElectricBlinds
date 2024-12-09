@@ -34,11 +34,13 @@ ErrorCode WifiDriver::deinit() {
 }
 
 ErrorCode WifiDriver::stop() {
-  return deinit();
+  WiFi.disconnect();
+  return E_OK;
 }
 
+
 ErrorCode WifiDriver::start() {
-  init();
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");

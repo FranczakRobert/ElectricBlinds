@@ -12,11 +12,10 @@ class DriverManager {
     
     ErrorCode startAllDrivers();
     ErrorCode stopAllDrivers();
-
-    private:
     ErrorCode initAllDrivers();
     ErrorCode deinitAllDrivers();
     
+    private:
     WifiDriver wifiDriver;
     Driver* drivers_array[DRIVERS_NUMBER];
 

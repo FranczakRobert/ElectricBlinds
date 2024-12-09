@@ -101,7 +101,6 @@ ErrorCode ESP32Server::deinit() {
   return E_OK;
 }
 
-
 ErrorCode ESP32Server::start(){
 
   init();

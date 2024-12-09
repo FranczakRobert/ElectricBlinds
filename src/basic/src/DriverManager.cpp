@@ -33,8 +33,6 @@ ErrorCode DriverManager::deinitAllDrivers() {
 
 ErrorCode DriverManager::startAllDrivers() {
 
-    initAllDrivers();
-
     for(int driverIndex = 0; driverIndex < DRIVERS_NUMBER; driverIndex++) {
         if(nullptr != drivers_array[driverIndex]) {
             drivers_array[driverIndex]->start();
@@ -57,8 +55,6 @@ ErrorCode DriverManager::stopAllDrivers() {
             return E_NOT_OK;
         }
     }
-
-    deinitAllDrivers();
     
     ESP32Server::GetInstance()->stop();
 
