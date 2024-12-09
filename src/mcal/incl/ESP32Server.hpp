@@ -23,7 +23,7 @@ class ESP32Server : public Driver {
     ErrorCode deinit() override;
 
     public:
-    static ESP32Server* GetiInstance();
+    static ESP32Server* GetInstance();
 
     ErrorCode start() override;
     ErrorCode stop() override;

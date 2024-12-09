@@ -101,10 +101,12 @@ ErrorCode ESP32Server::deinit() {
   return E_OK;
 }
 
-ErrorCode ESP32Server::start() {
-  init();
-  xTaskCreate(runWrapper,"Server",2048,NULL,1,&xHandle);
-  return E_OK;
+
+ErrorCode ESP32Server::start()
+{
+    init();
+    xTaskCreate(runWrapper, "Server", 2048, NULL, 1, &xHandle);
+    return E_OK;
 }
 
 ErrorCode ESP32Server::stop() {
