@@ -102,11 +102,13 @@ ErrorCode ESP32Server::deinit() {
 }
 
 
-ErrorCode ESP32Server::start()
-{
-    init();
-    xTaskCreate(runWrapper, "Server", 2048, NULL, 1, &xHandle);
-    return E_OK;
+ErrorCode ESP32Server::start(){
+
+  init();
+  vTaskDelay(100);
+  xTaskCreate(runWrapper, "Server", 2048, NULL, 1, &xHandle);
+
+  return E_OK;
 }
 
 ErrorCode ESP32Server::stop() {
@@ -120,6 +122,8 @@ void ESP32Server::runWrapper(void *params) {
 }
 
 void ESP32Server::run() {
-  ESP32Server::server.handleClient();
-  vTaskDelay(1);
+  while(1) {
+    ESP32Server::server.handleClient();
+    vTaskDelay(1);
+  }
 }
