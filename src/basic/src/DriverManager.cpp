@@ -5,6 +5,7 @@ DriverManager::DriverManager() {
 }
 
 ErrorCode DriverManager::initAllDrivers() {
+
     for(int driverIndex = 0; driverIndex < DRIVERS_NUMBER; driverIndex++) {
         if(nullptr != drivers_array[driverIndex]) {
             drivers_array[driverIndex]->init();
@@ -30,6 +31,9 @@ ErrorCode DriverManager::deinitAllDrivers() {
 }
 
 ErrorCode DriverManager::startAllDrivers() {
+
+    initAllDrivers();
+
     for(int driverIndex = 0; driverIndex < DRIVERS_NUMBER; driverIndex++) {
         if(nullptr != drivers_array[driverIndex]) {
             drivers_array[driverIndex]->start();
@@ -38,6 +42,8 @@ ErrorCode DriverManager::startAllDrivers() {
             return E_NOT_OK;
         }
     }
+    ESP32Server::GetInstance()->init();
+
     return E_OK;
 }
 
@@ -50,6 +56,9 @@ ErrorCode DriverManager::stopAllDrivers() {
             return E_NOT_OK;
         }
     }
+
+    deinitAllDrivers();
+    
     return E_OK;
 }
 

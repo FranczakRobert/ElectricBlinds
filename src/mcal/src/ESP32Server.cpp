@@ -2,9 +2,11 @@
 #include <WebServer.h>
 #include "ESP32Server.hpp"
 #include <ArduinoJson.h>
+#include "FreeRTOSManager.hpp"
 
 WebServer ESP32Server::server(8080);
 ESP32Server* ESP32Server::instance = nullptr;
+FreeRTOSManager freeRTOSManager;
 
 ESP32Server::ESP32Server() {
   /* SINGLETON */
@@ -53,7 +55,7 @@ void ESP32Server::handleRoot()
       </style>
     </head>
     <body>
-
+      <p> Hello </p>
     </body>
     </html>
     )rawliteral";
@@ -83,6 +85,7 @@ ErrorCode ESP32Server::init() {
   ESP32Server::server.on("/", HTTP_GET, handleRoot);
   ESP32Server::server.on("/LED", HTTP_POST, handlePost);
   ESP32Server::server.begin(8080);
+
   return E_OK;
 }
 
@@ -92,7 +95,7 @@ ErrorCode ESP32Server::deinit() {
 }
 
 ErrorCode ESP32Server::start() {
-  ESP32Server::server.handleClient();
+  ESP32Server::server.handleClient();  
   return E_OK;
 }
 
