@@ -2,8 +2,9 @@
 #define DRIVER_MANAGER_HPP
 
 #include "Driver.hpp"
-#include "WifiDriver.hpp"
 #include "ESP32Server.hpp"
+#include "LedDriver.hpp"
+#include "WifiDriver.hpp"
 
 class DriverManager {
     public:
@@ -14,9 +15,13 @@ class DriverManager {
     ErrorCode stopAllDrivers();
     ErrorCode initAllDrivers();
     ErrorCode deinitAllDrivers();
+
+    u8_t getWifiStatus();
     
     private:
-    WifiDriver wifiDriver;
+    WifiDriver wifiDriver = WifiDriver(this);
+    LedDriver ledDriver = LedDriver(this);;
+
     Driver* drivers_array[DRIVERS_NUMBER];
 
 };

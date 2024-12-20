@@ -2,6 +2,7 @@
 
 DriverManager::DriverManager() {
     drivers_array[D_WIFI] = &wifiDriver;
+    drivers_array[D_LED] = &ledDriver;
 }
 
 ErrorCode DriverManager::initAllDrivers() {
@@ -29,6 +30,11 @@ ErrorCode DriverManager::deinitAllDrivers() {
         }
     }
     return E_OK;
+}
+
+u8_t DriverManager::getWifiStatus()
+{
+    return wifiDriver.getIsConnected();
 }
 
 ErrorCode DriverManager::startAllDrivers() {

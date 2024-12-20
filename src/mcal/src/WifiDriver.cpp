@@ -1,12 +1,19 @@
 #include "WifiDriver.hpp"
 #include "WiFi.h"
 #include "WifiConfig.hpp"
+#include "DriverManager.hpp"
 
-WifiDriver::WifiDriver() {
+// WifiDriver::WifiDriver() {
 
+// }
+
+WifiDriver::WifiDriver(DriverManager *driverManager) {
+  this->driverManager = driverManager;
+  isConnected = 0;
 }
 
-WifiDriver::~WifiDriver() {
+WifiDriver::~WifiDriver()
+{
 }
 
 ErrorCode WifiDriver::init() {
@@ -38,6 +45,9 @@ ErrorCode WifiDriver::stop() {
   return E_OK;
 }
 
+u8_t WifiDriver::getIsConnected() {
+  return isConnected;
+}
 
 ErrorCode WifiDriver::start() {
 
@@ -45,6 +55,7 @@ ErrorCode WifiDriver::start() {
     delay(500);
     Serial.print(".");
   }
+  isConnected = 1;
 
   Serial.println("----------------");
   Serial.println("WiFi connected!");
