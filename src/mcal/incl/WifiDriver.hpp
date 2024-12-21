@@ -23,8 +23,6 @@ class WifiDriver : public Driver {
     u8_t isConnected;
     ErrorCode init() override;
     ErrorCode deinit() override;
-
-    DriverManager* driverManager;
 };
 
 #endif // WIFI_DRIVER_HPP

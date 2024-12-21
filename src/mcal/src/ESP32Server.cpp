@@ -5,7 +5,6 @@
 
 WebServer ESP32Server::server(8080);
 ESP32Server* ESP32Server::instance = nullptr;
-TaskHandle_t xHandle = NULL;
 
 ESP32Server::ESP32Server() {
   

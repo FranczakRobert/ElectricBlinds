@@ -4,6 +4,8 @@
 #include "ErrorCode.hpp"
 #include "Drivers.hpp"
 
+class DriverManager;
+
 class Driver {
     public:
     Driver(){}
@@ -13,6 +15,10 @@ class Driver {
     virtual ErrorCode deinit() = 0;
     virtual ErrorCode start() = 0;
     virtual ErrorCode stop() = 0;
+
+    protected:
+    TaskHandle_t xHandle = NULL;
+    DriverManager* driverManager;
 };
 
 
