@@ -3,13 +3,9 @@
 #include "WifiConfig.hpp"
 #include "DriverManager.hpp"
 
-// WifiDriver::WifiDriver() {
-
-// }
-
 WifiDriver::WifiDriver(DriverManager *driverManager) {
   this->driverManager = driverManager;
-  isConnected = 0;
+  isConnected = WIFI_NOT_CONNECTED;
 }
 
 WifiDriver::~WifiDriver()
@@ -17,8 +13,6 @@ WifiDriver::~WifiDriver()
 }
 
 ErrorCode WifiDriver::init() {
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
   WiFi.begin(ssid, password);
   delay(5000);
   return E_OK;
@@ -30,8 +24,7 @@ ErrorCode WifiDriver::deinit() {
 
   if(WL_CONNECTED == wifiStatus) {
     WiFi.disconnect(true);
-  }
-  else {
+  } else {
     return errorCode;
   }
 
@@ -50,17 +43,18 @@ u8_t WifiDriver::getIsConnected() {
 }
 
 ErrorCode WifiDriver::start() {
-
+  Serial.print("[Wifi] Started: ");
+  Serial.println(WiFi.localIP());
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  isConnected = 1;
+  isConnected = WIFI_CONNECTED;
 
-  Serial.println("----------------");
-  Serial.println("WiFi connected!");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
-  Serial.println("----------------");
+  // Serial.println("----------------");
+  // Serial.println("WiFi connected!");
+  // Serial.print("IP address: ");
+  // Serial.println(WiFi.localIP());
+  // Serial.println("----------------");
   return E_OK;
 }

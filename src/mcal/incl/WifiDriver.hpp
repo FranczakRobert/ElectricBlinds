@@ -5,6 +5,9 @@
 #include "WiFi.h"
 #include "Driver.hpp"
 
+#define WIFI_CONNECTED     1
+#define WIFI_NOT_CONNECTED 0
+
 class DriverManager;
 
 class WifiDriver : public Driver {

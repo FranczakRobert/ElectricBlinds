@@ -10,6 +10,7 @@
 class DriverManager;
 
 class LedDriver : public Driver {
+    TaskHandle_t xHandle = NULL;
 
     static void led_wifi_connecting_state_wrapper(void* _this);
     
@@ -21,8 +22,6 @@ class LedDriver : public Driver {
     ErrorCode stop() override;
 
     ErrorCode wifi_led_connecting();
-    // ErrorCode wifi_led_connected();
-    // ErrorCode wifi_led_disconneced();
 
     private:
     DriverManager* driverManager;

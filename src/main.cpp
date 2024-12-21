@@ -4,8 +4,13 @@ DriverManager driverManager;
 
 void setup() {
   Serial.begin(9600);
-  driverManager.initAllDrivers();
-  driverManager.startAllDrivers();
+  if(E_OK == driverManager.initAllDrivers()) {
+    Serial.println("[Driver Manager] - Init all drivers.");
+    if(E_OK == driverManager.startAllDrivers()) {
+      Serial.println("[Driver Manager] - Started all drivers.");
+    }
+  }
+  
 }
 
 void loop() {

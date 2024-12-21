@@ -103,17 +103,25 @@ ErrorCode ESP32Server::deinit() {
 
 ErrorCode ESP32Server::start(){
 
-  init();
-  vTaskDelay(100);
-  xTaskCreate(runWrapper, "Server", 2048, NULL, 1, &xHandle);
-
-  return E_OK;
+  if(E_OK == init()) {
+    vTaskDelay(100);
+    if(pdPASS == xTaskCreate(runWrapper, "Server", 2048, NULL, 1, &xHandle)) {
+      Serial.println("[ESP32Server] Started");
+      return E_OK;
+    }  
+  }
+  return E_NOT_OK;
 }
 
 ErrorCode ESP32Server::stop() {
-  vTaskDelete(xHandle);
-  deinit();
-  return E_OK;
+  if(eTaskGetState(xHandle) == eRunning) {
+    vTaskDelete(xHandle);
+    if(E_OK == deinit()) {
+      return E_OK;
+    }
+  }
+  
+  return E_NOT_OK;
 }
 
 void ESP32Server::runWrapper(void *params) {
