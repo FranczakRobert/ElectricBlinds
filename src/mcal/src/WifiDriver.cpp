@@ -43,7 +43,7 @@ u8_t WifiDriver::getIsConnected() {
 }
 
 ErrorCode WifiDriver::start() {
-  Serial.print("[Wifi] Started: ");
+  Serial.print("[Wifi] - started: ");
   Serial.println(WiFi.localIP());
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);

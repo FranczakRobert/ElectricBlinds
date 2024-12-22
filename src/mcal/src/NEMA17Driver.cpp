@@ -23,6 +23,7 @@ ErrorCode NEMA17Driver::deinit()
 }
 
 ErrorCode NEMA17Driver::start() {
+    Serial.println("[NEMA17] - started");
     const int stepsPerRevolution = 200; // Ilość kroków na obrót (dla 1.8° na krok)
     const int fullTurnSteps = stepsPerRevolution; // 360 stopni
 
@@ -42,7 +43,13 @@ ErrorCode NEMA17Driver::start() {
 }
 
 
-ErrorCode NEMA17Driver::stop()
-{
+ErrorCode NEMA17Driver::stop() {
+    Serial.println("[NEMA17] - STOP");
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, LOW);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, LOW);
+
     return ErrorCode();
 }
+

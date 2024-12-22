@@ -3,6 +3,7 @@
 DriverManager::DriverManager() {
     drivers_array[D_WIFI] = &wifiDriver;
     drivers_array[D_LED] = &ledDriver;
+    drivers_array[D_NEMA17] = &stepperDriver;
 }
 
 ErrorCode DriverManager::initAllDrivers() {
@@ -58,6 +59,8 @@ ErrorCode DriverManager::startAllDrivers() {
     }
 
     ESP32Server::GetInstance()->start();
+
+    drivers_array[D_NEMA17]->stop();
 
     return E_OK;
 }
