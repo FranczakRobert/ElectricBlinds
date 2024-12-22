@@ -1,10 +1,10 @@
 #ifndef DRIVER_MANAGER_HPP
 #define DRIVER_MANAGER_HPP
 
-#include "Driver.hpp"
 #include "ESP32Server.hpp"
 #include "LedDriver.hpp"
 #include "WifiDriver.hpp"
+#include "NEMA17Driver.hpp"
 
 class DriverManager {
     public:
@@ -20,7 +20,8 @@ class DriverManager {
     
     private:
     WifiDriver wifiDriver = WifiDriver(this);
-    LedDriver ledDriver = LedDriver(this);;
+    LedDriver ledDriver = LedDriver(this);
+    NEMA17Driver stepperDriver = NEMA17Driver(this);
 
     Driver* drivers_array[DRIVERS_NUMBER];
 
