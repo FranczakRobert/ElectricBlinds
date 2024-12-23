@@ -4,7 +4,6 @@
 #include "Driver.hpp"
 #include <Stepper.h>
 
-
 class DriverManager;
 
 class NEMA17Driver : public Driver {
@@ -14,13 +13,16 @@ class NEMA17Driver : public Driver {
     ~NEMA17Driver();
 
     ErrorCode start() override;
+    ErrorCode run();
     ErrorCode stop() override;
 
-    private:
-    const int IN1 = 14;
-    const int IN2 = 27;
-    const int IN3 = 26;
-    const int IN4 = 25;
+private:
+    const uint8_t IN1 = 14;
+    const uint8_t IN2 = 27;
+    const uint8_t IN3 = 26;
+    const uint8_t IN4 = 25;
+
+    uint8_t motor_state;
 
     Stepper myStepper;
     ErrorCode init() override;

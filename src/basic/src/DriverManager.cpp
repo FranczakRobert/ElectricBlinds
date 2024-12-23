@@ -19,6 +19,7 @@ ErrorCode DriverManager::initAllDrivers() {
             return E_NOT_OK;
         }
     }
+    ESP32Server::GetInstance()->setManager(this);
     Serial.println("Init performed...");
     return E_OK;
 }
@@ -44,6 +45,13 @@ u8_t DriverManager::getWifiStatus()
     return wifiDriver.getIsConnected();
 }
 
+u8_t DriverManager::setMotorStatus(struct MotorStatus motorStatus) {
+    Serial.print(motorStatus.direction);
+    Serial.print("  ----->   ");
+    Serial.println(motorStatus.status);
+    return u8_t();
+}
+
 ErrorCode DriverManager::startAllDrivers() {
 
     for(int driverIndex = 0; driverIndex < DRIVERS_NUMBER; driverIndex++) {
@@ -59,9 +67,6 @@ ErrorCode DriverManager::startAllDrivers() {
     }
 
     ESP32Server::GetInstance()->start();
-
-    drivers_array[D_NEMA17]->stop();
-
     return E_OK;
 }
 

@@ -89,6 +89,9 @@ void ESP32Server::handleRoot()
     let upButton = document.getElementById('upButton');
     let downButton = document.getElementById('downButton');
 
+    let isUpActive = false;
+    let isDownActive = false;
+
     // Obsługuje zarówno zdarzenia dla myszki jak i dotyku
     upButton.addEventListener('mousedown', function() {
         sendSignal('ArrowUp', 1);
@@ -96,24 +99,43 @@ void ESP32Server::handleRoot()
     upButton.addEventListener('mouseup', function() {
         sendSignal('ArrowUp', 0);
     });
-    upButton.addEventListener('touchstart', function() {
-        sendSignal('ArrowUp', 1);
-    });
-    upButton.addEventListener('touchend', function() {
-        sendSignal('ArrowUp', 0);
-    });
-
+    
     downButton.addEventListener('mousedown', function() {
         sendSignal('ArrowDown', 1);
     });
     downButton.addEventListener('mouseup', function() {
         sendSignal('ArrowDown', 0);
     });
-    downButton.addEventListener('touchstart', function() {
-        sendSignal('ArrowDown', 1);
+
+    // Obsługa dotyku z zapobieganiem wielokrotnym sygnałom
+    upButton.addEventListener('touchstart', function(event) {
+        event.preventDefault();
+        if (!isUpActive) {
+            isUpActive = true;
+            sendSignal('ArrowUp', 1);
+        }
     });
-    downButton.addEventListener('touchend', function() {
-        sendSignal('ArrowDown', 0);
+    upButton.addEventListener('touchend', function(event) {
+        event.preventDefault();
+        if (isUpActive) {
+            isUpActive = false;
+            sendSignal('ArrowUp', 0);
+        }
+    });
+
+    downButton.addEventListener('touchstart', function(event) {
+        event.preventDefault();
+        if (!isDownActive) {
+            isDownActive = true;
+            sendSignal('ArrowDown', 1);
+        }
+    });
+    downButton.addEventListener('touchend', function(event) {
+        event.preventDefault();
+        if (isDownActive) {
+            isDownActive = false;
+            sendSignal('ArrowDown', 0);
+        }
     });
 
     function sendSignal(name, val) {
@@ -135,12 +157,11 @@ void ESP32Server::handleRoot()
         })
         .catch(error => console.error('Error:', error));
     }
-  </script>
+    </script>
   </body>
   </html>)rawliteral";
   ESP32Server::server.send(200, "text/html", html);
 }
-
 
 
 void ESP32Server::handlePost() {
@@ -149,25 +170,17 @@ void ESP32Server::handlePost() {
     String body = ESP32Server::server.arg("plain");
 
     deserializeJson(doc, body);
+    struct MotorStatus motorStatus;
 
     const char* name = doc["name"];
     int val = doc["val"];
+    // 1  gora 0 dol
+    motorStatus.direction = strcmp(name, "ArrowUp") == 0 ? 1u : 0u;
 
-    if (strcmp(name, "ArrowUp") == 0) {
-      if (val == 1) {
-        Serial.println("Arrow Up PRESSED");
-      } else {
-        Serial.println("Arrow Up RELEASED");
-      }
-    } else if (strcmp(name, "ArrowDown") == 0) {
-      if (val == 1) {
-        Serial.println("Arrow Down PRESSED");
-      } else {
-        Serial.println("Arrow Down RELEASED");
-      }
-    } else {
-      Serial.println("Unknown action received");
-    }
+    // 1  hold 0 released
+    motorStatus.status = val == 1 ? 1u : 0u;
+
+    ESP32Server::GetInstance()->driverManager->setMotorStatus(motorStatus);
   }
   
   ESP32Server::server.send(200, "text/html", "<html><body><h1>GPIO zmienione</h1></body></html>");
@@ -208,6 +221,12 @@ ErrorCode ESP32Server::stop() {
   }
   
   return E_NOT_OK;
+}
+
+ErrorCode ESP32Server::setManager(DriverManager *drMg)
+{
+  ESP32Server::driverManager = drMg;
+  return ErrorCode();
 }
 
 void ESP32Server::runWrapper(void *params) {

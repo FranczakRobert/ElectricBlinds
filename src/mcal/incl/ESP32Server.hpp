@@ -4,6 +4,8 @@
 #include "Driver.hpp"
 #include <WiFi.h>
 #include <WebServer.h>
+#include "DriverManager.hpp"
+#include "MotorStatus.hpp"
 
 class ESP32Server : public Driver {
     protected:
@@ -19,6 +21,8 @@ class ESP32Server : public Driver {
     static void runWrapper(void *params);
 
     private:
+    DriverManager* driverManager;
+
     ErrorCode init() override;
     ErrorCode deinit() override;
 
@@ -27,6 +31,7 @@ class ESP32Server : public Driver {
 
     ErrorCode start() override;
     ErrorCode stop() override;
+    ErrorCode setManager(DriverManager *drMg);
     void run();
 
     ESP32Server(ESP32Server &other) = delete;
