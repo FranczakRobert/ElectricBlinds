@@ -17,7 +17,6 @@ class Driver {
     virtual ErrorCode stop() = 0;
 
     protected:
-    TaskHandle_t xHandle = NULL;
     DriverManager* driverManager;
 };
 

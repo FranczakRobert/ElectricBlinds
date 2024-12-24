@@ -3,18 +3,30 @@
 
 #include "Driver.hpp"
 #include <Stepper.h>
+#include "MotorStatus.hpp" 
+#include "Thread.hpp"
+
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+
+#define HOLD       1
+#define RELEASE    0
+#define ARROW_UP   1
+#define ARROW_DOWN 0
 
 class DriverManager;
 
-class NEMA17Driver : public Driver {
+class NEMA17Driver : public Driver, public Thread {
 
-    public:
+    static void* run(void* args);
+    
+public:
     NEMA17Driver(DriverManager* driverManager);
     ~NEMA17Driver();
 
     ErrorCode start() override;
-    ErrorCode run();
     ErrorCode stop() override;
+    ErrorCode setMotorState(struct MotorStatus motorStatus);
 
 private:
     const uint8_t IN1 = 14;
@@ -22,7 +34,8 @@ private:
     const uint8_t IN3 = 26;
     const uint8_t IN4 = 25;
 
-    uint8_t motor_state;
+    MotorStatus motor_state;
+    uint8_t prev_motor_state;
 
     Stepper myStepper;
     ErrorCode init() override;

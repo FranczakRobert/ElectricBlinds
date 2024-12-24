@@ -173,11 +173,8 @@ void ESP32Server::handlePost() {
     struct MotorStatus motorStatus;
 
     const char* name = doc["name"];
-    int val = doc["val"];
-    // 1  gora 0 dol
+    uint8_t val = doc["val"];
     motorStatus.direction = strcmp(name, "ArrowUp") == 0 ? 1u : 0u;
-
-    // 1  hold 0 released
     motorStatus.status = val == 1 ? 1u : 0u;
 
     ESP32Server::GetInstance()->driverManager->setMotorStatus(motorStatus);
@@ -187,55 +184,43 @@ void ESP32Server::handlePost() {
 }
 
 ErrorCode ESP32Server::init() {
-  
   ESP32Server::server.on("/", HTTP_GET, handleRoot);
   ESP32Server::server.on("/LED", HTTP_POST, handlePost);
   ESP32Server::server.begin(8080);
-
   return E_OK;
 }
 
 ErrorCode ESP32Server::deinit() {
-  ESP32Server::server.stop();
+  
   return E_OK;
 }
 
 ErrorCode ESP32Server::start(){
+  ESP32Server::GetInstance()->isRunning = 1;
 
   if(E_OK == init()) {
-    vTaskDelay(100);
-    if(pdPASS == xTaskCreate(runWrapper, "Server", 2048, NULL, 1, &xHandle)) {
-      Serial.println("[ESP32Server] Started");
-      return E_OK;
-    }  
+    int er = pthread_create(&ptid, NULL, &ESP32Server::run, this);
   }
+  Serial.println("[Server][start] - Server start");
   return E_NOT_OK;
 }
 
 ErrorCode ESP32Server::stop() {
-  if(eTaskGetState(xHandle) == eRunning) {
-    vTaskDelete(xHandle);
-    if(E_OK == deinit()) {
-      return E_OK;
-    }
-  }
-  
-  return E_NOT_OK;
+  ESP32Server::GetInstance()->isRunning = 0;
+  int a = pthread_join(ptid, NULL);
+  Serial.println("[Server][stop]- Server stopped");
+  return E_OK;
 }
 
-ErrorCode ESP32Server::setManager(DriverManager *drMg)
-{
+ErrorCode ESP32Server::setManager(DriverManager *drMg) {
   ESP32Server::driverManager = drMg;
   return ErrorCode();
 }
 
-void ESP32Server::runWrapper(void *params) {
-  ESP32Server::GetInstance()->run();
-}
-
-void ESP32Server::run() {
-  while(1) {
+void* ESP32Server::run(void* args) {
+  while(ESP32Server::GetInstance()->isRunning) {
     ESP32Server::server.handleClient();
-    vTaskDelay(1);
+    vTaskDelay(10 / portTICK_PERIOD_MS);
   }
+  return nullptr;
 }

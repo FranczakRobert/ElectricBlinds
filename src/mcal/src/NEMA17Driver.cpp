@@ -2,24 +2,29 @@
 #include "DriverManager.hpp"
 
 
-NEMA17Driver::NEMA17Driver(DriverManager *driverManager) 
-: myStepper(200, IN1, IN2,IN3,IN4) {
+NEMA17Driver::NEMA17Driver(DriverManager *driverManager)
+    : myStepper(200, IN1, IN2, IN3, IN4)
+{
     this->driverManager = driverManager;
-    motor_state = 0;
 }
 
-NEMA17Driver::~NEMA17Driver()
-{
+NEMA17Driver::~NEMA17Driver() {
 }
 
 ErrorCode NEMA17Driver::init() {
-
+    isRunning = 1;
+    motor_state = {RELEASE,ARROW_UP};
+    int er = pthread_create(&ptid, NULL, &NEMA17Driver::run, this);
     myStepper.setSpeed(60);
+
     return ErrorCode();
 }
 
 ErrorCode NEMA17Driver::deinit()
 {
+    isRunning = 0;
+    int a = pthread_join(ptid, NULL);
+    Serial.println("[NEMA17] - deinit");
     return ErrorCode();
 }
 
@@ -29,49 +34,47 @@ ErrorCode NEMA17Driver::start() {
     digitalWrite(IN2, LOW); 
     digitalWrite(IN3, HIGH);
     digitalWrite(IN4, LOW);
-    motor_state = 1;
 
-    
+    if(1 == motor_state.direction) {
+        myStepper.step(10);
+    }else{
+        myStepper.step(-10);
+    }
 
     return ErrorCode();
 }
 
-ErrorCode NEMA17Driver::run() {
-    while(1) {
-        switch (motor_state)
-        {
-        case 0:
-            start();
-            break;
+void *NEMA17Driver::run(void *args)
+{
+    NEMA17Driver* self = static_cast<NEMA17Driver*>(args);
+    while (self->isRunning) {
 
-        case 1:
-            stop();
-        break;
-        
-        default:
-            break;
+        while(self->motor_state.status) {
+            self->start();
         }
 
-        if(0 == motor_state) {
-           
-        }else{
-            // OVERHIT 
-            stop();
+        if(self->prev_motor_state != self->motor_state.status) {
+            self->stop();
         }
 
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+        self->prev_motor_state = self->motor_state.status;
     }
+    return nullptr;
 }
 
 
 ErrorCode NEMA17Driver::stop() {
-    Serial.println("[NEMA17] - STOP");
+
     digitalWrite(IN1, LOW);
     digitalWrite(IN2, LOW);
     digitalWrite(IN3, LOW);
     digitalWrite(IN4, LOW);
 
-    motor_state = 3;
-
     return ErrorCode();
 }
 
+ErrorCode NEMA17Driver::setMotorState(struct MotorStatus motorStatus) {
+    memcpy(&this->motor_state,&motorStatus,sizeof(motorStatus));
+    return ErrorCode();
+}

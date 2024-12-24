@@ -19,11 +19,11 @@ class DriverManager {
     ErrorCode deinitAllDrivers();
 
     u8_t getWifiStatus();
-    u8_t setRequest();
+    u8_t setWifiLedOff();
+    
     u8_t setMotorStatus(struct MotorStatus);
     
     private:
-    // ESP32Server& espServer;
     WifiDriver wifiDriver = WifiDriver(this);
     LedDriver ledDriver = LedDriver(this);
     NEMA17Driver stepperDriver = NEMA17Driver(this);

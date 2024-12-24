@@ -1,8 +1,8 @@
 #include "DriverManager.hpp"
 
 DriverManager::DriverManager() {
-    drivers_array[D_WIFI] = &wifiDriver;
     drivers_array[D_LED] = &ledDriver;
+    drivers_array[D_WIFI] = &wifiDriver;
     drivers_array[D_NEMA17] = &stepperDriver;
 }
 
@@ -16,11 +16,13 @@ ErrorCode DriverManager::initAllDrivers() {
             }
         }
         else {
+            Serial.printf("[Driver Manager] - init driver nr %d is nullptr \n",driverIndex);
             return E_NOT_OK;
         }
     }
+
     ESP32Server::GetInstance()->setManager(this);
-    Serial.println("Init performed...");
+
     return E_OK;
 }
 
@@ -34,6 +36,7 @@ ErrorCode DriverManager::deinitAllDrivers() {
             }
         }
         else {
+            Serial.printf("[Driver Manager] - deinit driver nr %d is nullptr \n",driverIndex);
             return E_NOT_OK;
         }
     }
@@ -45,10 +48,10 @@ u8_t DriverManager::getWifiStatus()
     return wifiDriver.getIsConnected();
 }
 
-u8_t DriverManager::setMotorStatus(struct MotorStatus motorStatus) {
-    Serial.print(motorStatus.direction);
-    Serial.print("  ----->   ");
-    Serial.println(motorStatus.status);
+
+u8_t DriverManager::setMotorStatus(struct MotorStatus motorStatus) {    
+    stepperDriver.setMotorState(motorStatus);
+    
     return u8_t();
 }
 
@@ -61,7 +64,8 @@ ErrorCode DriverManager::startAllDrivers() {
                 return E_NOT_OK;
             }
         }
-        else {
+       else {
+            Serial.printf("[Driver Manager] - start driver nr %d is nullptr \n",driverIndex);
             return E_NOT_OK;
         }
     }
@@ -71,6 +75,9 @@ ErrorCode DriverManager::startAllDrivers() {
 }
 
 ErrorCode DriverManager::stopAllDrivers() {
+
+    ESP32Server::GetInstance()->stop();
+
     for(int driverIndex = 0; driverIndex < DRIVERS_NUMBER; driverIndex++) {
         if(nullptr != drivers_array[driverIndex]) {
             if(E_NOT_OK == drivers_array[driverIndex]->stop()) {
@@ -83,8 +90,6 @@ ErrorCode DriverManager::stopAllDrivers() {
         }
     }
     
-    ESP32Server::GetInstance()->stop();
-
     return E_OK;
 }
 

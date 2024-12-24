@@ -4,13 +4,17 @@
 
 #include "WiFi.h"
 #include "Driver.hpp"
+#include "Thread.hpp"
 
 #define WIFI_CONNECTED     1
 #define WIFI_NOT_CONNECTED 0
 
 class DriverManager;
 
-class WifiDriver : public Driver {
+class WifiDriver : public Driver, public Thread {
+    
+    static void* run(void* args);
+
     public:
     WifiDriver(DriverManager* driverManager);
     ~WifiDriver();

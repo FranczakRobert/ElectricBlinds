@@ -2,12 +2,13 @@
 #define LED_DRIVER_HPP
 
 #include "Driver.hpp"
+#include "Thread.hpp"
 
 class DriverManager;
 
-class LedDriver : public Driver {
+class LedDriver : public Driver, public Thread  {
 
-    static void led_wifi_connecting_state_wrapper(void* _this);
+    static void* run(void* args);
 
     public:
     LedDriver(DriverManager* driverManager);
@@ -15,7 +16,6 @@ class LedDriver : public Driver {
 
     ErrorCode start() override;
     ErrorCode stop() override;
-    ErrorCode wifi_led_connecting();
 
     private:
     ErrorCode init() override;
