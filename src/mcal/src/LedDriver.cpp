@@ -10,32 +10,41 @@ LedDriver::~LedDriver() {
 
 }
 
-ErrorCode LedDriver::init()
-{
-    Serial.println("[LED] init...");
-    pinMode(LED_BUILTIN,OUTPUT);
+ErrorCode LedDriver::init() {
+    pinMode(WIFI_LED,OUTPUT);
     return E_OK;
 }
 
-ErrorCode LedDriver::deinit()
-{
+ErrorCode LedDriver::deinit() {
+    digitalWrite(WIFI_LED,LOW);
     return ErrorCode();
 }
 
 ErrorCode LedDriver::start() {
     isRunning = 1;
-    int er = pthread_create(&ptid, NULL, &LedDriver::run, this);
+    if(0 == pthread_create(&ptid, NULL, &LedDriver::run, this)){
+        Serial.println("[LED][start] - OK");
+        return E_OK;
+    }
+    Serial.println("[LED][start] - ERROR");
     return E_NOT_OK;
+    
 }
 
 ErrorCode LedDriver::stop() {
     isRunning = 0;
-    pthread_exit(NULL);
-    vTaskDelay(30 / portTICK_PERIOD_MS);
-    int a = pthread_join(ptid, NULL);
-    Serial.println("[LED] - led stopped");
+    if(0 == pthread_join(ptid, NULL)) {
+        Serial.println("[LED][stop] - OK");
+        return E_OK;
+    }
+    Serial.println("[LED][stop] - ERROR");
+    return E_NOT_OK;
+}
 
-    return E_OK;
+ErrorCode LedDriver::setLedOff()
+{
+    digitalWrite(WIFI_LED,LOW);
+    return ErrorCode();
 }
 
 void *LedDriver::run(void *args)
@@ -46,14 +55,14 @@ void *LedDriver::run(void *args)
         switch (self->driverManager->getWifiStatus())
         {
         case 0:
-            digitalWrite(LED_BUILTIN,HIGH);
+            digitalWrite(WIFI_LED,HIGH);
             vTaskDelay(500 / portTICK_PERIOD_MS);
-            digitalWrite(LED_BUILTIN,LOW);
+            digitalWrite(WIFI_LED,LOW);
             vTaskDelay(500 / portTICK_PERIOD_MS);
         break;
 
         case 1:
-            digitalWrite(LED_BUILTIN,HIGH);
+            digitalWrite(WIFI_LED,HIGH);
         break;
         
         default:
@@ -61,6 +70,6 @@ void *LedDriver::run(void *args)
         }
         vTaskDelay(100);
     }
-    digitalWrite(LED_BUILTIN,LOW);
+    digitalWrite(WIFI_LED,LOW);
     return nullptr;
 }

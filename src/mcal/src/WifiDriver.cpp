@@ -24,13 +24,13 @@ ErrorCode WifiDriver::deinit() {
 }
 
 ErrorCode WifiDriver::stop() {
-  WiFi.disconnect();
   isRunning = 0;
-  vTaskDelay(30 / portTICK_PERIOD_MS);
-  int a = pthread_join(ptid, NULL);
-  Serial.println("[WIFI][stop] - wifi stopped");
-
-  return E_OK;
+  if(0 == pthread_join(ptid, NULL)) {
+    Serial.println("[WIFI][stop] - OK");
+    driverManager->setWifiLedOff();
+    return E_OK;
+  }
+  return E_NOT_OK;
 }
 
 u8_t WifiDriver::getIsConnected() {
@@ -39,19 +39,21 @@ u8_t WifiDriver::getIsConnected() {
 
 void* WifiDriver::run(void* args) {
   WifiDriver* self = static_cast<WifiDriver*>(args);
+  WiFi.begin(ssid, password);
+
   while (self->isRunning) {
     switch (WiFi.status())
     {
       case !WL_CONNECTED:
         Serial.println("[Wifi] [run] - contecting....");
         WiFi.begin(ssid, password);
-        delay(1000);
+        delay(3000);
         break;
 
       case WL_CONNECTED:
         Serial.println(WiFi.localIP());
         self->isConnected = WIFI_CONNECTED;
-        delay(1000);
+        delay(5000);
         break;
       
       default:
@@ -59,14 +61,17 @@ void* WifiDriver::run(void* args) {
     }
     vTaskDelay(10 / portTICK_PERIOD_MS);
   }
+  WiFi.disconnect();
   return nullptr;
 }
 
 ErrorCode WifiDriver::start() {
-  Serial.println("[WIFI][start] - wifi start");
   isRunning = 1;
-  WiFi.begin(ssid, password);
-  int er = pthread_create(&ptid, NULL, &WifiDriver::run, this);
-  
-  return E_OK;
+  if(0 == pthread_create(&ptid, NULL, &WifiDriver::run, this)) {
+    Serial.println("[WIFI][start] - OK");
+    return E_OK;
+  }
+  Serial.println("[WIFI][start] - ERROR");
+
+  return E_NOT_OK;
 }

@@ -14,6 +14,7 @@ ErrorCode DriverManager::initAllDrivers() {
                 Serial.printf("[Driver Manager] - init driver nr %d failed \n",driverIndex);
                 return E_NOT_OK;
             }
+            Serial.printf("[Driver Manager] - init driver nr %d \n",driverIndex);
         }
         else {
             Serial.printf("[Driver Manager] - init driver nr %d is nullptr \n",driverIndex);
@@ -48,6 +49,11 @@ u8_t DriverManager::getWifiStatus()
     return wifiDriver.getIsConnected();
 }
 
+u8_t DriverManager::setWifiLedOff()
+{
+    ledDriver.setLedOff();
+    return u8_t();
+}
 
 u8_t DriverManager::setMotorStatus(struct MotorStatus motorStatus) {    
     stepperDriver.setMotorState(motorStatus);

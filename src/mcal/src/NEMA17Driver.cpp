@@ -13,23 +13,56 @@ NEMA17Driver::~NEMA17Driver() {
 
 ErrorCode NEMA17Driver::init() {
     isRunning = 1;
-    motor_state = {RELEASE,ARROW_UP};
-    int er = pthread_create(&ptid, NULL, &NEMA17Driver::run, this);
     myStepper.setSpeed(60);
-
+    motor_state = {RELEASE,ARROW_UP};
     return ErrorCode();
 }
 
 ErrorCode NEMA17Driver::deinit()
 {
-    isRunning = 0;
-    int a = pthread_join(ptid, NULL);
-    Serial.println("[NEMA17] - deinit");
+    motorLow();
     return ErrorCode();
 }
 
 ErrorCode NEMA17Driver::start() { 
+    isRunning = 1;
+    if(0 == pthread_create(&ptid, NULL, &NEMA17Driver::run, this)) {
+        Serial.println("[NEMA17][start] - OK");
+        return E_OK;
+    }
+    Serial.println("[NEMA17][start] - ERROR");
+    return E_NOT_OK;
+}
 
+void *NEMA17Driver::run(void *args)
+{
+    NEMA17Driver* self = static_cast<NEMA17Driver*>(args);
+    while (self->isRunning) {
+        
+        if(self->motor_state.status) {
+            self->motorHigh();
+        }
+
+        if(self->prev_motor_state != self->motor_state.status) {
+            self->motorLow();
+        }
+
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+        self->prev_motor_state = self->motor_state.status;
+    }
+    return nullptr;
+}
+
+ErrorCode NEMA17Driver::motorLow()  {
+
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, LOW);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, LOW);
+    return E_OK;
+}
+
+ErrorCode NEMA17Driver::motorHigh() {
     digitalWrite(IN1, HIGH);
     digitalWrite(IN2, LOW); 
     digitalWrite(IN3, HIGH);
@@ -40,38 +73,17 @@ ErrorCode NEMA17Driver::start() {
     }else{
         myStepper.step(-10);
     }
-
-    return ErrorCode();
+    return E_OK;
 }
-
-void *NEMA17Driver::run(void *args)
-{
-    NEMA17Driver* self = static_cast<NEMA17Driver*>(args);
-    while (self->isRunning) {
-
-        while(self->motor_state.status) {
-            self->start();
-        }
-
-        if(self->prev_motor_state != self->motor_state.status) {
-            self->stop();
-        }
-
-        vTaskDelay(10 / portTICK_PERIOD_MS);
-        self->prev_motor_state = self->motor_state.status;
-    }
-    return nullptr;
-}
-
 
 ErrorCode NEMA17Driver::stop() {
-
-    digitalWrite(IN1, LOW);
-    digitalWrite(IN2, LOW);
-    digitalWrite(IN3, LOW);
-    digitalWrite(IN4, LOW);
-
-    return ErrorCode();
+    isRunning = 0;
+    if(0 == pthread_join(ptid, NULL)) {
+        Serial.println("[NEMA17][stop] - OK");
+        return E_OK;
+    }
+    Serial.println("[NEMA17][stop] - ERROR");
+    return E_NOT_OK;
 }
 
 ErrorCode NEMA17Driver::setMotorState(struct MotorStatus motorStatus) {

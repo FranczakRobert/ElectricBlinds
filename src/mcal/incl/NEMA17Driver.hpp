@@ -19,7 +19,7 @@ class DriverManager;
 class NEMA17Driver : public Driver, public Thread {
 
     static void* run(void* args);
-    
+
 public:
     NEMA17Driver(DriverManager* driverManager);
     ~NEMA17Driver();
@@ -33,6 +33,9 @@ private:
     const uint8_t IN2 = 27;
     const uint8_t IN3 = 26;
     const uint8_t IN4 = 25;
+
+    ErrorCode motorHigh();
+    ErrorCode motorLow();
 
     MotorStatus motor_state;
     uint8_t prev_motor_state;

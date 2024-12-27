@@ -199,16 +199,22 @@ ErrorCode ESP32Server::start(){
   ESP32Server::GetInstance()->isRunning = 1;
 
   if(E_OK == init()) {
-    int er = pthread_create(&ptid, NULL, &ESP32Server::run, this);
+    if( 0 == pthread_create(&ptid, NULL, &ESP32Server::run, this)) {
+      Serial.println("[Server][start] - OK");
+      return E_OK;
+    }
   }
-  Serial.println("[Server][start] - Server start");
+  Serial.println("[Server][start] - ERROR");
   return E_NOT_OK;
 }
 
 ErrorCode ESP32Server::stop() {
   ESP32Server::GetInstance()->isRunning = 0;
-  int a = pthread_join(ptid, NULL);
-  Serial.println("[Server][stop]- Server stopped");
+  if(0 == pthread_join(ptid, NULL)) {
+    Serial.println("[Server][stop]- OK");
+    return E_OK;
+  }
+  Serial.println("[Server][stop] - ERROR");
   return E_OK;
 }
 
