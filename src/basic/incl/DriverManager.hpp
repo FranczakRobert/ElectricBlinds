@@ -22,6 +22,7 @@ class DriverManager {
 
     u8_t getWifiStatus();
     u8_t setWifiLedOff();
+    ErrorCode updateWifiLedStatus(bool);
     
     u8_t setMotorStatus(struct MotorStatus);
     

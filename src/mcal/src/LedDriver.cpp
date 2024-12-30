@@ -52,23 +52,22 @@ void *LedDriver::run(void *args)
     LedDriver* self = static_cast<LedDriver*>(args);
 
     while (self->isRunning) {
-        switch (self->driverManager->getWifiStatus())
-        {
-        case 0:
-            digitalWrite(WIFI_LED,HIGH);
-            vTaskDelay(500 / portTICK_PERIOD_MS);
-            digitalWrite(WIFI_LED,LOW);
-            vTaskDelay(500 / portTICK_PERIOD_MS);
-        break;
-
-        case 1:
-            digitalWrite(WIFI_LED,HIGH);
-        break;
-        
-        default:
+        switch (self->driverManager->getWifiStatus()) {
+            case 0:
+                digitalWrite(WIFI_LED,HIGH);
+                vTaskDelay(500 / portTICK_PERIOD_MS);
+                digitalWrite(WIFI_LED,LOW);
+                vTaskDelay(500 / portTICK_PERIOD_MS);
             break;
+
+            case 1:
+                digitalWrite(WIFI_LED,HIGH);
+            break;
+            
+            default:
+                break;
         }
-        vTaskDelay(100);
+        vTaskDelay(1000);
     }
     digitalWrite(WIFI_LED,LOW);
     return nullptr;
