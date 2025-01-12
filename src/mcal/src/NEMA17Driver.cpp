@@ -13,7 +13,7 @@ NEMA17Driver::~NEMA17Driver() {
 
 ErrorCode NEMA17Driver::init() {
     isRunning = 1;
-    myStepper.setSpeed(60);
+    myStepper.setSpeed(30);
     motor_state = {RELEASE,ARROW_UP};
     return ErrorCode();
 }

@@ -8,7 +8,7 @@
 
 #include "MotorStatus.hpp"
 
-#define WIFI_LED LED_BUILTIN
+#define WIFI_LED  13 // LED_BUILTIN / 13
 
 class DriverManager {
     public:

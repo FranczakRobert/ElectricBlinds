@@ -139,8 +139,7 @@ void ESP32Server::handleRoot()
     });
 
     function sendSignal(name, val) {
-        console.log(`Sending signal: ${name} with value: ${val}`); // Log dla debugowania
-        fetch('/LED', {
+        fetch('/motorControll', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -175,6 +174,7 @@ void ESP32Server::handlePost() {
     const char* name = doc["name"];
     uint8_t val = doc["val"];
     motorStatus.direction = strcmp(name, "ArrowUp") == 0 ? 1u : 0u;
+
     motorStatus.status = val == 1 ? 1u : 0u;
 
     ESP32Server::GetInstance()->driverManager->setMotorStatus(motorStatus);
@@ -185,7 +185,7 @@ void ESP32Server::handlePost() {
 
 ErrorCode ESP32Server::init() {
   ESP32Server::server.on("/", HTTP_GET, handleRoot);
-  ESP32Server::server.on("/LED", HTTP_POST, handlePost);
+  ESP32Server::server.on("/motorControll", HTTP_POST, handlePost);
   ESP32Server::server.begin(8080);
   return E_OK;
 }

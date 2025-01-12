@@ -47,13 +47,18 @@ void* WifiDriver::run(void* args) {
       case !WL_CONNECTED:
         Serial.println("[Wifi] [run] - contecting....");
         WiFi.begin(ssid, password);
-        delay(3000);
+        delay(2000);
         break;
 
       case WL_CONNECTED:
         Serial.println(WiFi.localIP());
         self->isConnected = WIFI_CONNECTED;
-        delay(5000);
+        delay(2000);
+        break;
+      
+      case 5:
+        self->isConnected = 0;
+        delay(1000);
         break;
       
       default:
