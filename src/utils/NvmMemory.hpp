@@ -3,11 +3,11 @@
 
 #include "Arduino.h"
 #include <Preferences.h>
-
 class NvmMemory
 {
+    
 private:
-    NvmMemory();
+    NvmMemory(){/*Empty*/};
     NvmMemory(const NvmMemory&) = delete;
     NvmMemory& operator=(const NvmMemory&) = delete;
 
