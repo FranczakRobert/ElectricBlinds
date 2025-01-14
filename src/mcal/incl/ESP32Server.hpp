@@ -11,15 +11,14 @@
 class ESP32Server : public Driver , public Thread {
     protected:
 
-    static WebServer server;
-    static ESP32Server* instance;
-    // bool isRunning;
-
     ESP32Server();
-    ~ESP32Server() {delete instance;}
+    ~ESP32Server() {}
 
     static void handleRoot();
-    static void handlePost();
+    static void handleMotorPost();
+    static void handleBlindsTimerPost();
+    static void setRandLTimers();
+    
     static void* run(void* args);
 
     private:
@@ -30,7 +29,14 @@ class ESP32Server : public Driver , public Thread {
     ErrorCode deinit() override;
 
     public:
-    static ESP32Server* GetInstance();
+    static WebServer server;
+    static String loweringTimeVal;
+    static String raisingTimeVal;
+
+    static ESP32Server& GetInstance() {
+        static ESP32Server instance;
+        return instance;
+    }
 
     ErrorCode start() override;
     ErrorCode stop() override;

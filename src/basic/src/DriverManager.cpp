@@ -22,7 +22,7 @@ ErrorCode DriverManager::initAllDrivers() {
         }
     }
 
-    ESP32Server::GetInstance()->setManager(this);
+    ESP32Server::GetInstance().setManager(this);
 
     return E_OK;
 }
@@ -76,13 +76,13 @@ ErrorCode DriverManager::startAllDrivers() {
         }
     }
 
-    ESP32Server::GetInstance()->start();
+    ESP32Server::GetInstance().start();
     return E_OK;
 }
 
 ErrorCode DriverManager::stopAllDrivers() {
 
-    ESP32Server::GetInstance()->stop();
+    ESP32Server::GetInstance().stop();
 
     for(int driverIndex = 0; driverIndex < DRIVERS_NUMBER; driverIndex++) {
         if(nullptr != drivers_array[driverIndex]) {
