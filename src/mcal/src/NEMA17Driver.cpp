@@ -44,10 +44,11 @@ void *NEMA17Driver::run(void *args)
         }
 
         if(self->prev_motor_state != self->motor_state.status) {
-            self->motorLow();
+            self->motorLow();    
         }
 
         vTaskDelay(10 / portTICK_PERIOD_MS);
+
         self->prev_motor_state = self->motor_state.status;
     }
     return nullptr;
@@ -59,6 +60,7 @@ ErrorCode NEMA17Driver::motorLow()  {
     digitalWrite(IN2, LOW);
     digitalWrite(IN3, LOW);
     digitalWrite(IN4, LOW);
+    
     return E_OK;
 }
 
@@ -69,10 +71,25 @@ ErrorCode NEMA17Driver::motorHigh() {
     digitalWrite(IN4, LOW);
 
     if(1 == motor_state.direction) {
-        myStepper.step(10);
-    }else{
-        myStepper.step(-10);
+        if(position < POSITION_MIN) {
+            position = POSITION_MIN;
+        }
+        if(position < POSITION_MAX) {
+            myStepper.step(10);
+            position++;
+        }
+        
+    }else if(0 == motor_state.direction) {
+        if(position > POSITION_MAX) {
+            position = POSITION_MAX;
+        }
+        if(position > POSITION_MIN) {
+            myStepper.step(-10);
+            position--;
+        }
+        
     }
+    
     return E_OK;
 }
 

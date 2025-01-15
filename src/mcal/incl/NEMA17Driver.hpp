@@ -14,6 +14,9 @@
 #define ARROW_UP   1
 #define ARROW_DOWN 0
 
+#define POSITION_MAX 30
+#define POSITION_MIN 0
+
 class DriverManager;
 
 class NEMA17Driver : public Driver, public Thread {
@@ -39,6 +42,7 @@ private:
 
     MotorStatus motor_state;
     uint8_t prev_motor_state;
+    int position = 0;
 
     Stepper myStepper;
     ErrorCode init() override;

@@ -18,13 +18,10 @@ class ESP32Server : public Driver , public Thread {
     static void handleMotorPost();
     static void handleBlindsTimerPost();
     static void setRandLTimers();
-    
     static void* run(void* args);
 
     private:
     DriverManager* driverManager;
-    
-    private:
     ErrorCode init() override;
     ErrorCode deinit() override;
 

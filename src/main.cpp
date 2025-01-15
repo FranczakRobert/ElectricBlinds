@@ -21,13 +21,6 @@ void setup() {
   } else {
     Serial.println("[Driver Manager] - Init all drivers FAILED.");
   }
-
-  // String loweringTimeVal = NvmMemory::getInstance().readFromNvm("TIME", "L");
-  // String raisingTimeVal = NvmMemory::getInstance().readFromNvm("TIME", "R");
-
-  // Serial.println("ODCZYT");
-  // Serial.println(loweringTimeVal);
-  // Serial.println(raisingTimeVal);
 }
 
 void loop() {
