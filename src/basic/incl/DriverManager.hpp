@@ -8,7 +8,7 @@
 
 #include "MotorStatus.hpp"
 
-#define WIFI_LED  13 // LED_BUILTIN / 13
+#define WIFI_LED  21
 
 class DriverManager {
     public:
@@ -22,7 +22,6 @@ class DriverManager {
 
     u8_t getWifiStatus();
     u8_t setWifiLedOff();
-    ErrorCode updateWifiLedStatus(bool);
     
     u8_t setMotorStatus(struct MotorStatus);
     

@@ -32,6 +32,8 @@ public:
     ErrorCode setMotorState(struct MotorStatus motorStatus);
 
 private:
+    static int position;
+
     const uint8_t IN1 = 14;
     const uint8_t IN2 = 27;
     const uint8_t IN3 = 26;
@@ -40,9 +42,11 @@ private:
     ErrorCode motorHigh();
     ErrorCode motorLow();
 
+    ErrorCode motorMAXHigh();
+    ErrorCode motorMAXLow();
+
     MotorStatus motor_state;
     uint8_t prev_motor_state;
-    int position = 0;
 
     Stepper myStepper;
     ErrorCode init() override;

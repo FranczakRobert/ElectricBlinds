@@ -9,6 +9,7 @@
         "stdexcept": "cpp",
         "tuple": "cpp",
         "typeinfo": "cpp",
-        "new": "cpp"
+        "new": "cpp",
+        "string": "cpp"
     }
 }
