@@ -32,8 +32,7 @@ ErrorCode LedDriver::start() {
 }
 
 ErrorCode LedDriver::stop() {
-    isRunning = 0;
-    if(0 == pthread_join(ptid, NULL)) {
+    if(E_OK == stopThread()) {
         Serial.println("[LED][stop] - OK");
         return E_OK;
     }

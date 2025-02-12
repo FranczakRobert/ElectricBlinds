@@ -15,21 +15,24 @@ WifiDriver::~WifiDriver()
 }
 
 ErrorCode WifiDriver::init() {
-
+  WiFi.begin(ssid, password);
   return E_OK;
 }
 
 ErrorCode WifiDriver::deinit() {
+  WiFi.disconnect();
  return E_OK;
 }
 
 ErrorCode WifiDriver::stop() {
-  isRunning = 0;
-  if(0 == pthread_join(ptid, NULL)) {
-    Serial.println("[WIFI][stop] - OK");
+  if(E_OK == stopThread()) {
     driverManager->setWifiLedOff();
+    Serial.println("[WIFI][stop] - OK");
+
     return E_OK;
   }
+  Serial.println("[WIFI][stop] - ERROR");
+
   return E_NOT_OK;
 }
 
@@ -47,7 +50,6 @@ WifiStats WifiDriver::getWifiStats() {
 */
 void* WifiDriver::run(void* args) {
   WifiDriver* self = static_cast<WifiDriver*>(args);
-  WiFi.begin(ssid, password);
 
   while (self->isRunning) {
     switch (WiFi.status())
@@ -79,12 +81,6 @@ void* WifiDriver::run(void* args) {
 }
 
 ErrorCode WifiDriver::start() {
-  isRunning = 1;
-  if(0 == pthread_create(&ptid, NULL, &WifiDriver::run, this)) {
-    Serial.println("[WIFI][start] - OK");
-    return E_OK;
-  }
-  Serial.println("[WIFI][start] - ERROR");
-
-  return E_NOT_OK;
+  startThread(this,run);
+  return E_OK;
 }

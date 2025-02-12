@@ -350,7 +350,7 @@ ErrorCode ESP32Server::start(){
     pthread_attr_init(&attr);
     pthread_attr_setstacksize(&attr, stack_size);
 
-    if( 0 == pthread_create(&ptid, NULL, &ESP32Server::run, this)) {
+    if( E_OK == startThread(this,run)) {
       Serial.println("[Server][start] - OK");
       return E_OK;
     }
@@ -361,7 +361,7 @@ ErrorCode ESP32Server::start(){
 
 ErrorCode ESP32Server::stop() {
   ESP32Server::GetInstance().isRunning = 0;
-  if(0 == pthread_join(ptid, NULL)) {
+  if(E_OK == stopThread()) {
     Serial.println("[Server][stop]- OK");
     return E_OK;
   }
@@ -377,8 +377,6 @@ ErrorCode ESP32Server::setManager(DriverManager *drMg) {
 void* ESP32Server::run(void* args) {
   while(ESP32Server::GetInstance().isRunning) {
     ESP32Server::server.handleClient();    
-    // Serial.print("Free Heap: ");
-    // Serial.println(esp_get_free_heap_size());
     vTaskDelay(10 / portTICK_PERIOD_MS);
   }
   return nullptr;

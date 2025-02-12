@@ -24,8 +24,8 @@ class DriverManager;
 class WifiDriver : public Driver, public Thread {
     
     static void* run(void* args);
-
-    public:
+    
+public:
     WifiDriver(DriverManager* driverManager);
     ~WifiDriver();
     

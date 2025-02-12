@@ -39,8 +39,7 @@ ErrorCode NEMA17Driver::deinit()
 }
 
 ErrorCode NEMA17Driver::start() { 
-    isRunning = 1;
-    if(0 == pthread_create(&ptid, NULL, &NEMA17Driver::run, this)) {
+    if(E_OK == startThread(this,run)) {
         Serial.println("[NEMA17][start] - OK");
         return E_OK;
     }
@@ -118,8 +117,8 @@ ErrorCode NEMA17Driver::motorHigh() {
 }
 
 ErrorCode NEMA17Driver::stop() {
-    isRunning = 0;
-    if(0 == pthread_join(ptid, NULL)) {
+    
+    if(E_OK == stopThread()) {
         Serial.println("[NEMA17][stop] - OK");
         return E_OK;
     }

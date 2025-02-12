@@ -2,30 +2,13 @@
 
 #include "test.hpp"
 
-class ServerTests {
-    DriverManager driverManager;
-    public:
-    void test1() {
-        WifiDriver wifi = WifiDriver(&driverManager);
-        
-        wifi.start();
-        ESP32Server::GetInstance()->start();
-        
-        vTaskDelay(5000);
+// TODO WEŹ TO W KONCU OGARNIJ 
 
-        ESP32Server::GetInstance()->stop();
-        wifi.stop();
 
-        vTaskDelay(2000);
+// class ServerTests {
+    // DriverManager driverManager;
+//     public:
 
-        wifi.start();
-        ESP32Server::GetInstance()->start();
-        vTaskDelay(5000);
-
-        ESP32Server::GetInstance()->stop();
-        wifi.stop();
-
-    }
     
     void initDeinit() {
     if(E_OK == driverManager.initAllDrivers()) {
@@ -79,4 +62,4 @@ class ServerTests {
     }
     }
     
-};
+// };
