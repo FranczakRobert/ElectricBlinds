@@ -50,18 +50,23 @@ ErrorCode LedDriver::setLedOff()
 void *LedDriver::run(void *args)
 {
     LedDriver* self = static_cast<LedDriver*>(args);
-
+    u8_t lastValue = 0;
     while (self->isRunning) {
-        switch (self->driverManager->getWifiStatus()) {
-            case 0:
+        u8_t isWifiConnected = self->driverManager->getWifiStatus().status.isConnected;
+        switch (isWifiConnected) {
+            case WIFI_NOT_CONNECTED:
                 digitalWrite(WIFI_LED,HIGH);
                 vTaskDelay(500 / portTICK_PERIOD_MS);
                 digitalWrite(WIFI_LED,LOW);
                 vTaskDelay(500 / portTICK_PERIOD_MS);
+                lastValue = WIFI_NOT_CONNECTED;
             break;
 
-            case 1:
-                digitalWrite(WIFI_LED,HIGH);
+            case WIFI_CONNECTED:
+                if(isWifiConnected != lastValue) {
+                    digitalWrite(WIFI_LED,HIGH);
+                }
+                lastValue = WIFI_CONNECTED;
             break;
             
             default:

@@ -44,9 +44,9 @@ ErrorCode DriverManager::deinitAllDrivers() {
     return E_OK;
 }
 
-u8_t DriverManager::getWifiStatus()
+WifiStats DriverManager::getWifiStatus()
 {
-    return wifiDriver.getIsConnected();
+    return wifiDriver.getWifiStats();
 }
 
 u8_t DriverManager::setWifiLedOff()

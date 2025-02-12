@@ -6,7 +6,7 @@
 WifiDriver::WifiDriver(DriverManager *driverManager)
 {
   this->driverManager = driverManager;
-  isConnected = WIFI_NOT_CONNECTED;
+  wifiStats.state = 0;
   isRunning = 1;
 }
 
@@ -33,10 +33,18 @@ ErrorCode WifiDriver::stop() {
   return E_NOT_OK;
 }
 
-u8_t WifiDriver::getIsConnected() {
-  return isConnected;
+WifiStats WifiDriver::getWifiStats() {
+  return wifiStats;
 }
 
+
+//TODO 
+/*
+  1. Jezeli po 5 próbach nie połączy sie z wifi
+    a) porzuci łączenie się
+	b) Wystawi AP z wpisaniem passów.
+	c) po wpisaniu passów zmknie AP i ponownie zacznie procedure Connect.
+*/
 void* WifiDriver::run(void* args) {
   WifiDriver* self = static_cast<WifiDriver*>(args);
   WiFi.begin(ssid, password);
@@ -52,12 +60,12 @@ void* WifiDriver::run(void* args) {
 
       case WL_CONNECTED:
         Serial.println(WiFi.localIP());
-        self->isConnected = WIFI_CONNECTED;
+        self->wifiStats.status.isConnected = WIFI_CONNECTED;
         delay(2000);
         break;
       
-      case 5:
-        self->isConnected = 0;
+      case WL_CONNECTION_LOST:
+        self->wifiStats.status.isConnected = 0;
         delay(1000);
         break;
       

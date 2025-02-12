@@ -9,6 +9,16 @@
 #define WIFI_CONNECTED     1
 #define WIFI_NOT_CONNECTED 0
 
+union WifiStats{
+	u8_t state;
+	struct STATS{
+		u8_t isConnected : 1;
+        u8_t hasCredentials : 1; 
+	}status;
+};
+
+typedef union WifiStats WifiStatsU;
+
 class DriverManager;
 
 class WifiDriver : public Driver, public Thread {
@@ -21,10 +31,11 @@ class WifiDriver : public Driver, public Thread {
     
     ErrorCode start() override;
     ErrorCode stop() override;
-    u8_t getIsConnected();
+    WifiStats getWifiStats();
 
     private:
-    u8_t isConnected;
+    WifiStatsU wifiStats = {0};
+
     ErrorCode init() override;
     ErrorCode deinit() override;
 };

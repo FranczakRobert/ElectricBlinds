@@ -20,7 +20,7 @@ class DriverManager {
     ErrorCode initAllDrivers();
     ErrorCode deinitAllDrivers();
 
-    u8_t getWifiStatus();
+    WifiStats getWifiStatus();
     u8_t setWifiLedOff();
     
     u8_t setMotorStatus(struct MotorStatus);
