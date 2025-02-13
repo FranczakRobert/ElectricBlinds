@@ -61,7 +61,7 @@ void *LedDriver::run(void *args)
                 lastValue = WIFI_NOT_CONNECTED;
             break;
 
-            case 2:
+            case WIFI_CONFIG_MODE:
                 digitalWrite(WIFI_LED,HIGH);
                 vTaskDelay(100 / portTICK_PERIOD_MS);
                 digitalWrite(WIFI_LED,LOW);

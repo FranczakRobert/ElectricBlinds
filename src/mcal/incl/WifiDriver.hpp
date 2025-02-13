@@ -6,8 +6,9 @@
 #include "Driver.hpp"
 #include "Thread.hpp"
 
-#define WIFI_CONNECTED     1
 #define WIFI_NOT_CONNECTED 0
+#define WIFI_CONNECTED     1
+#define WIFI_CONFIG_MODE 2
 
 union WifiStats{
 	u8_t state;
