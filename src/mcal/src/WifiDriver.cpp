@@ -231,8 +231,8 @@ WifiDataS WifiDriver::GetBlindsDataByAP() {
       client.println("</script>");
       client.println("</body></html>");
 
-      // client.stop();
-      // Serial.println("Połączenie zamknięte.");
+      client.stop();
+      Serial.println("Połączenie zamknięte.");
     }
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
