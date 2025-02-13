@@ -2,6 +2,7 @@
 #include "WiFi.h"
 #include "WifiConfig.hpp"
 #include "DriverManager.hpp"
+#include "NvmMemory.hpp"
 
 #include <ArduinoJson.h>
 #include <DNSServer.h>
@@ -29,8 +30,15 @@ ErrorCode WifiDriver::init() {
   if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS)) {
     Serial.println("STA Failed to configure");
   }
+  String ssid = NvmMemory::getInstance().readFromNvm("CREDENTIALS","SSID");
+  String psswd = NvmMemory::getInstance().readFromNvm("CREDENTIALS","PSSWD");
+  vTaskDelay(100);
 
-  WiFi.begin(ssid, password);
+  WiFi.begin(
+    ssid,
+    psswd
+  );
+
   return E_OK;
 }
 
@@ -88,8 +96,8 @@ void* WifiDriver::run(void* args) {
         break;
       
       case WL_DISCONNECTED:
+        self->wifiStats.status.isConnected = 2;
         wifiCred = self->GetBlindsDataByAP();
-        // WiFi.begin(wifiCred.ssid, wifiCred.psswd);
         delay(1000);
         break;
       
@@ -116,15 +124,14 @@ DNSServer dnsServer;
 
 WifiDataS WifiDriver::GetBlindsDataByAP() {
   const char* ssid     = "Home-Rolety";
-  const char* password = "12345678";
+  const char* password = NULL;
   bool doIHaveData = false;
   
   WiFi.softAP(ssid, password);
   WiFi.softAPConfig(IPAddress(192,168,4,1), IPAddress(192,168,4,1), IPAddress(255,255,255,0));
   dnsServer.start(53, "*", IPAddress(192,168,4,1));
-
-  IPAddress IP = WiFi.softAPIP();
   server.begin();
+
   String header;
 
   while (isRunning && !doIHaveData)
@@ -132,7 +139,7 @@ WifiDataS WifiDriver::GetBlindsDataByAP() {
     dnsServer.processNextRequest();
     WiFiClient client = server.available();
     if (client) {
-      Serial.println("Nowy klient podłączony.");
+      Serial.println("New client connected");
       String header = "";
       String postData = "";
       bool isPost = false;
@@ -163,14 +170,14 @@ WifiDataS WifiDriver::GetBlindsDataByAP() {
         const char* psswd = doc["password"];
 
         doIHaveData = true;
-        wifiData.psswd = String(psswd);
         wifiData.ssid = String(ssid);
-
+        wifiData.psswd = String(psswd);
+      
         WiFi.begin(wifiData.ssid, wifiData.psswd);
         bool tryagain = false;
-        int counter = 0;
+        uint8_t counter = 0;
 
-        while (!tryagain) {
+        while (doIHaveData) {
 
           if (WiFi.status() == WL_CONNECTED){
             Serial.println(WiFi.localIP());
@@ -178,6 +185,9 @@ WifiDataS WifiDriver::GetBlindsDataByAP() {
             client.stop();
             server.close();
             WiFi.softAPdisconnect();
+            
+            NvmMemory::getInstance().writeToNvm("CREDENTIALS","SSID",ssid);
+            NvmMemory::getInstance().writeToNvm("CREDENTIALS","PSSWD",psswd);
             
             return wifiData;
           }
@@ -187,7 +197,6 @@ WifiDataS WifiDriver::GetBlindsDataByAP() {
               counter++;
               if(counter >= 4) {
                 doIHaveData = false;
-                tryagain = true;
               }
               delay(2000);
           }
@@ -213,7 +222,7 @@ WifiDataS WifiDriver::GetBlindsDataByAP() {
       client.println("<input type='text' id='ssid' name='ssid'><br>");
       client.println("<label for='password'>Haslo:</label>");
       client.println("<input type='password' id='password' name='password'><br>");
-      client.println("<button type='button' onclick='sendData()'>ZAPISZ</button>");
+      client.println("<button type='button' onclick='sendData()'>POŁĄCZ */</button>");
       client.println("</form>");
       client.println("<script>");
       client.println("function sendData() {");
@@ -232,7 +241,7 @@ WifiDataS WifiDriver::GetBlindsDataByAP() {
       client.println("</body></html>");
 
       client.stop();
-      Serial.println("Połączenie zamknięte.");
+      Serial.println("Connection closed");
     }
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }

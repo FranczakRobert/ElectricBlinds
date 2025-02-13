@@ -12,7 +12,7 @@
 union WifiStats{
 	u8_t state;
 	struct STATS{
-		u8_t isConnected : 1;
+		u8_t isConnected : 2;
         u8_t hasCredentials : 1; 
 	}status;
 };

@@ -61,6 +61,14 @@ void *LedDriver::run(void *args)
                 lastValue = WIFI_NOT_CONNECTED;
             break;
 
+            case 2:
+                digitalWrite(WIFI_LED,HIGH);
+                vTaskDelay(100 / portTICK_PERIOD_MS);
+                digitalWrite(WIFI_LED,LOW);
+                vTaskDelay(100 / portTICK_PERIOD_MS);
+                lastValue = WIFI_NOT_CONNECTED;
+            break;
+
             case WIFI_CONNECTED:
                 if(isWifiConnected != lastValue) {
                     digitalWrite(WIFI_LED,HIGH);
@@ -71,7 +79,7 @@ void *LedDriver::run(void *args)
             default:
                 break;
         }
-        vTaskDelay(1000);
+        vTaskDelay(500);
     }
     digitalWrite(WIFI_LED,LOW);
     return nullptr;
