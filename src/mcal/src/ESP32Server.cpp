@@ -3,6 +3,7 @@
 #include <ArduinoJson.h>
 #include "NvmMemory.hpp"
 #include "freertos/semphr.h"
+#include <ESPmDNS.h>
 
 #include <Preferences.h>
 class Preferences;
