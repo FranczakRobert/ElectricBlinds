@@ -62,12 +62,15 @@ void* WifiDriver::run(void* args) {
   while (self->isRunning) {
     switch (WiFi.status())
     {
-      case !WL_CONNECTED:
+      case WL_IDLE_STATUS:
         Serial.println("[Wifi] [run] - contecting....");
-        
+        Serial.println(counter);
+        Serial.println(WiFi.status());
         counter++;
         if(counter >= 4) {
           WiFi.disconnect();
+          WiFi._setStatus(WL_DISCONNECTED);
+          counter = 0;
         }
         delay(2000);
         break;
@@ -83,11 +86,10 @@ void* WifiDriver::run(void* args) {
         self->wifiStats.status.isConnected = 0;
         delay(1000);
         break;
-
+      
       case WL_DISCONNECTED:
         wifiCred = self->GetBlindsDataByAP();
-
-        WiFi.begin(wifiCred.ssid, wifiCred.psswd);
+        // WiFi.begin(wifiCred.ssid, wifiCred.psswd);
         delay(1000);
         break;
       
@@ -101,7 +103,7 @@ void* WifiDriver::run(void* args) {
 }
 
 ErrorCode WifiDriver::start() {
-  if(E_OK == startThread(this,run)) {
+  if(E_OK == startThread(this,run),true) {
     Serial.println("[WIFI][start] - OK");
     return E_OK;
   }
@@ -112,10 +114,9 @@ ErrorCode WifiDriver::start() {
 WiFiServer server(80);
 DNSServer dnsServer;
 
-
 WifiDataS WifiDriver::GetBlindsDataByAP() {
   const char* ssid     = "Home-Rolety";
-  const char* password = NULL;
+  const char* password = "12345678";
   bool doIHaveData = false;
   
   WiFi.softAP(ssid, password);
@@ -130,7 +131,6 @@ WifiDataS WifiDriver::GetBlindsDataByAP() {
   {
     dnsServer.processNextRequest();
     WiFiClient client = server.available();
-
     if (client) {
       Serial.println("Nowy klient podłączony.");
       String header = "";
@@ -165,10 +165,33 @@ WifiDataS WifiDriver::GetBlindsDataByAP() {
         doIHaveData = true;
         wifiData.psswd = String(psswd);
         wifiData.ssid = String(ssid);
-        client.stop();
-        server.close();
-        WiFi.softAPdisconnect();
-        return wifiData;
+
+        WiFi.begin(wifiData.ssid, wifiData.psswd);
+        bool tryagain = false;
+        int counter = 0;
+
+        while (!tryagain) {
+
+          if (WiFi.status() == WL_CONNECTED){
+            Serial.println(WiFi.localIP());
+            wifiStats.status.isConnected = WIFI_CONNECTED;
+            client.stop();
+            server.close();
+            WiFi.softAPdisconnect();
+            
+            return wifiData;
+          }
+
+          if(WiFi.status() != WL_CONNECTED) {
+            Serial.println("[Wifi][GetBlindsDataByAP] - contecting....");
+              counter++;
+              if(counter >= 4) {
+                doIHaveData = false;
+                tryagain = true;
+              }
+              delay(2000);
+          }
+        }       
       }
     
       client.println("HTTP/1.1 200 OK");
@@ -184,11 +207,11 @@ WifiDataS WifiDriver::GetBlindsDataByAP() {
       client.println(" form { margin: 0 auto; width: 300px; } ");
       client.println("</style>");
       client.println("</head><body>");
-      client.println("<h1>Konfiguracja ESP32</h1>");
+      client.println("<h1>Konfiguracja Rolety</h1>");
       client.println("<form id='wifiForm'>");
       client.println("<label for='ssid'>Nazwa sieci WiFi:</label>");
       client.println("<input type='text' id='ssid' name='ssid'><br>");
-      client.println("<label for='password'>Hasło:</label>");
+      client.println("<label for='password'>Haslo:</label>");
       client.println("<input type='password' id='password' name='password'><br>");
       client.println("<button type='button' onclick='sendData()'>ZAPISZ</button>");
       client.println("</form>");
@@ -208,8 +231,8 @@ WifiDataS WifiDriver::GetBlindsDataByAP() {
       client.println("</script>");
       client.println("</body></html>");
 
-      client.stop();
-      Serial.println("Połączenie zamknięte.");
+      // client.stop();
+      // Serial.println("Połączenie zamknięte.");
     }
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
