@@ -17,6 +17,12 @@ union WifiStats{
 	}status;
 };
 
+struct WifiData{
+    String ssid;
+    String psswd;
+};
+
+typedef struct WifiData WifiDataS;
 typedef union WifiStats WifiStatsU;
 
 class DriverManager;
@@ -35,9 +41,12 @@ public:
 
     private:
     WifiStatsU wifiStats = {0};
+    WifiDataS wifiData;
 
     ErrorCode init() override;
     ErrorCode deinit() override;
+
+    WifiData GetBlindsDataByAP();
 };
 
 #endif // WIFI_DRIVER_HPP
