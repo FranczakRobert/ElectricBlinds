@@ -4,6 +4,7 @@
 LedDriver::LedDriver(DriverManager *driverManager)
 {
     this->driverManager = driverManager;
+    TAG = "LED";
 }
 
 LedDriver::~LedDriver() {
@@ -21,23 +22,12 @@ ErrorCode LedDriver::deinit() {
 }
 
 ErrorCode LedDriver::start() {
-    isRunning = 1;
-    if(0 == pthread_create(&ptid, NULL, &LedDriver::run, this)){
-        Serial.println("[LED][start] - OK");
-        return E_OK;
-    }
-    Serial.println("[LED][start] - ERROR");
-    return E_NOT_OK;
+    return startThread(TAG,this,run);
     
 }
 
 ErrorCode LedDriver::stop() {
-    if(E_OK == stopThread()) {
-        Serial.println("[LED][stop] - OK");
-        return E_OK;
-    }
-    Serial.println("[LED][stop] - ERROR");
-    return E_NOT_OK;
+    return stopThread(TAG);
 }
 
 ErrorCode LedDriver::setLedOff()

@@ -10,6 +10,7 @@ NEMA17Driver::NEMA17Driver(DriverManager *driverManager)
     : myStepper(200, IN1, IN2, IN3, IN4)
 {
     this->driverManager = driverManager;
+    TAG = "NEMA17";
 }
 
 NEMA17Driver::~NEMA17Driver() {
@@ -39,12 +40,7 @@ ErrorCode NEMA17Driver::deinit()
 }
 
 ErrorCode NEMA17Driver::start() { 
-    if(E_OK == startThread(this,run)) {
-        Serial.println("[NEMA17][start] - OK");
-        return E_OK;
-    }
-    Serial.println("[NEMA17][start] - ERROR");
-    return E_NOT_OK;
+    return startThread(TAG,this,run);
 }
 
 void *NEMA17Driver::run(void *args)
@@ -117,13 +113,7 @@ ErrorCode NEMA17Driver::motorHigh() {
 }
 
 ErrorCode NEMA17Driver::stop() {
-    
-    if(E_OK == stopThread()) {
-        Serial.println("[NEMA17][stop] - OK");
-        return E_OK;
-    }
-    Serial.println("[NEMA17][stop] - ERROR");
-    return E_NOT_OK;
+    return stopThread(TAG);
 }
 
 ErrorCode NEMA17Driver::setMotorState(struct MotorStatus motorStatus) {

@@ -351,23 +351,15 @@ ErrorCode ESP32Server::start(){
     pthread_attr_init(&attr);
     pthread_attr_setstacksize(&attr, stack_size);
 
-    if( E_OK == startThread(this,run)) {
-      Serial.println("[Server][start] - OK");
+    if( E_OK == startThread("SERVER",this,run)) {
       return E_OK;
     }
   }
-  Serial.println("[Server][start] - ERROR");
   return E_NOT_OK;
 }
 
 ErrorCode ESP32Server::stop() {
-  ESP32Server::GetInstance().isRunning = 0;
-  if(E_OK == stopThread()) {
-    Serial.println("[Server][stop]- OK");
-    return E_OK;
-  }
-  Serial.println("[Server][stop] - ERROR");
-  return E_OK;
+  return stopThread("SERVER");
 }
 
 ErrorCode ESP32Server::setManager(DriverManager *drMg) {

@@ -9,6 +9,7 @@
 #define WIFI_NOT_CONNECTED 0
 #define WIFI_CONNECTED     1
 #define WIFI_CONFIG_MODE 2
+#define WIFI_RETRIES_MAX 4
 
 union WifiStats{
 	u8_t state;
@@ -35,7 +36,6 @@ class WifiDriver : public Driver, public Thread {
 public:
     WifiDriver(DriverManager* driverManager);
     ~WifiDriver();
-    
     ErrorCode start() override;
     ErrorCode stop() override;
     WifiStats getWifiStats();
@@ -47,7 +47,7 @@ public:
     ErrorCode init() override;
     ErrorCode deinit() override;
 
-    WifiData GetBlindsDataByAP();
+    void getBlindsDataByAP();
 };
 
 #endif // WIFI_DRIVER_HPP

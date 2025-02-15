@@ -10,7 +10,7 @@ class Thread {
     bool isRunning = true;
     pthread_t ptid;
 
-    ErrorCode startThread(Driver* driver, void *funcPtr(void*),bool maxStackSize = false) {
+    ErrorCode startThread(const char* component, Driver* driver, void *funcPtr(void*),bool maxStackSize = false) {
 
         if(maxStackSize) {
             pthread_t ptid;
@@ -20,17 +20,20 @@ class Thread {
         }
 
         if(0 == pthread_create(&ptid, NULL, funcPtr, driver)) {
+            Serial.printf("%s [start] - OK\n",component);
             return E_OK;
         }
-        
+        Serial.printf("%s [start] - ERROR\n",component);
         return E_NOT_OK;
     }
 
-    ErrorCode stopThread() {
+    ErrorCode stopThread(const char* component) {
         isRunning = 0;
         if(0 == pthread_join(ptid, NULL)) {
+            Serial.printf("%s [stop] - OK\n",component);
             return E_OK;
         }
+        Serial.printf("%s [stop] - ERROR\n",component);
         return E_NOT_OK;
     }
 };
