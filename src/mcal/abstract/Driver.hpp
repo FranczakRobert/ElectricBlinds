@@ -9,7 +9,6 @@ class DriverManager;
 class Driver {
     public:
     const char* TAG;
-
     Driver(){}
     virtual ~Driver(){}
 

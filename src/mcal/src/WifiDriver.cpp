@@ -3,6 +3,7 @@
 #include "WifiConfig.hpp"
 #include "DriverManager.hpp"
 #include "NvmMemory.hpp"
+#include "Pages.hpp"
 
 #include <ArduinoJson.h>
 #include <DNSServer.h>
@@ -190,38 +191,7 @@ void WifiDriver::getBlindsDataByAP() {
       client.println("Content-type:text/html");
       client.println("Connection: close");
       client.println();
-      client.println("<!DOCTYPE html>");
-      client.println("<html lang='pl'><head>");
-      client.println("<meta name='viewport' content='width=device-width, initial-scale=1'>");
-      client.println("<style> body { text-align: center; font-family: Arial; } ");
-      client.println(" input, button { font-size: 18px; padding: 10px; margin: 5px; width: 80%; }");
-      client.println(" label { display: block; margin-bottom: 10px; } ");
-      client.println(" form { margin: 0 auto; width: 300px; } ");
-      client.println("</style>");
-      client.println("</head><body>");
-      client.println("<h1>Konfiguracja Rolety</h1>");
-      client.println("<form id='wifiForm'>");
-      client.println("<label for='ssid'>Nazwa sieci WiFi:</label>");
-      client.println("<input type='text' id='ssid' name='ssid'><br>");
-      client.println("<label for='password'>Haslo:</label>");
-      client.println("<input type='password' id='password' name='password'><br>");
-      client.println("<button type='button' onclick='sendData()'>POŁĄCZ */</button>");
-      client.println("</form>");
-      client.println("<script>");
-      client.println("function sendData() {");
-      client.println("  var ssid = document.getElementById('ssid').value;");
-      client.println("  var password = document.getElementById('password').value;");
-      client.println("  var jsonData = JSON.stringify({ssid: ssid, password: password});");
-      client.println("  var xhr = new XMLHttpRequest();");
-      client.println("  xhr.open('POST', '/submit', true);");
-      client.println("  xhr.setRequestHeader('Content-Type', 'application/json');");
-      client.println("  xhr.send(jsonData);");
-      client.println("  alert('Dane zapisane! Poczekaj do 10 sekund połączenie.');");
-      client.println("  document.getElementById('ssid').value = '';");
-      client.println("  document.getElementById('password').value = '';");
-      client.println("}");
-      client.println("</script>");
-      client.println("</body></html>");
+      client.println(configPage);
 
       client.flush();
       client.stop();
