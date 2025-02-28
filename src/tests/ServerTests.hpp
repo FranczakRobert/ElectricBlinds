@@ -5,9 +5,9 @@
 // TODO WEŹ TO W KONCU OGARNIJ 
 
 
-// class ServerTests {
-    // DriverManager driverManager;
-//     public:
+class ServerTests {
+    DriverManager driverManager;
+    public:
 
     
     void initDeinit() {
@@ -62,4 +62,4 @@
     }
     }
     
-// };
+};
