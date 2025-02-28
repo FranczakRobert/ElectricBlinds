@@ -16,7 +16,8 @@ class LedDriver : public Driver, public Thread  {
 
     ErrorCode start() override;
     ErrorCode stop() override;
-    ErrorCode setLedOff();
+    DataSignalsResponse getData(DataSignals) override;
+    ErrorCode setData(DataSignals) override;
 
     private:
     ErrorCode init() override;

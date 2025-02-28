@@ -44,21 +44,13 @@ ErrorCode DriverManager::deinitAllDrivers() {
     return E_OK;
 }
 
-WifiStats DriverManager::getWifiStatus()
-{
-    return wifiDriver.getWifiStats();
+DataSignalsResponse DriverManager::getDriverData(Drivers driver,DataSignals signal) {
+    return drivers_array[driver]->getData(signal);
 }
 
-u8_t DriverManager::setWifiLedOff()
-{
-    ledDriver.setLedOff();
-    return u8_t();
-}
-
-u8_t DriverManager::setMotorStatus(struct MotorStatus motorStatus) {    
-    stepperDriver.setMotorState(motorStatus);
-    
-    return u8_t();
+ErrorCode DriverManager::setDriverData(Drivers driver, DataSignals signal) {
+    drivers_array[driver]->setData(signal);
+    return ErrorCode();
 }
 
 ErrorCode DriverManager::startAllDrivers() {

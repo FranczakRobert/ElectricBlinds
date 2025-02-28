@@ -6,10 +6,10 @@
 #include "Driver.hpp"
 #include "Thread.hpp"
 
-#define WIFI_NOT_CONNECTED 0
-#define WIFI_CONNECTED     1
-#define WIFI_CONFIG_MODE 2
-#define WIFI_RETRIES_MAX 4
+#define WIFI_CONNECTED     0
+#define WIFI_NOT_CONNECTED 1
+#define WIFI_CONFIG_MODE   2
+#define WIFI_RETRIES_MAX   4
 
 union WifiStats{
 	u8_t state;
@@ -38,7 +38,8 @@ public:
     ~WifiDriver();
     ErrorCode start() override;
     ErrorCode stop() override;
-    WifiStats getWifiStats();
+    DataSignalsResponse getData(DataSignals SIGNAL) override;
+    ErrorCode setData(DataSignals) override;
 
     private:
     WifiStatsU wifiStats = {0};

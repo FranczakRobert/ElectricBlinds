@@ -54,14 +54,21 @@ ErrorCode WifiDriver::deinit() {
 
 ErrorCode WifiDriver::stop() {
   if(E_OK == stopThread(TAG)) {
-    driverManager->setWifiLedOff();
+    driverManager->setDriverData(D_LED,S_SET_WIFI_LED_OFF);
     return E_OK;
   }
   return E_NOT_OK;
 }
 
-WifiStats WifiDriver::getWifiStats() {
-  return wifiStats;
+
+DataSignalsResponse WifiDriver::getData(DataSignals SIGNAL)
+{
+  return (DataSignalsResponse)wifiStats.state;
+}
+
+ErrorCode WifiDriver::setData(DataSignals SIGNAL)
+{
+  return ErrorCode();
 }
 
 void* WifiDriver::run(void* args) {
@@ -82,17 +89,17 @@ void* WifiDriver::run(void* args) {
 
       case WL_CONNECTED:
         Serial.println(WiFi.localIP());
-        self->wifiStats.status.isConnected = WIFI_CONNECTED;
+        self->wifiStats.state = WIFI_CONNECTED;
         counter = 0;
         break;
       
       case WL_CONNECTION_LOST:
-        self->wifiStats.status.isConnected = WIFI_NOT_CONNECTED;
+        self->wifiStats.state = WIFI_NOT_CONNECTED;
         WiFi.reconnect();
         break;
       
       case WL_NO_SSID_AVAIL:
-        self->wifiStats.status.isConnected = WIFI_CONFIG_MODE;
+        self->wifiStats.state = WIFI_CONFIG_MODE;
         self->getBlindsDataByAP();
         break;
       
@@ -119,8 +126,6 @@ void WifiDriver::getBlindsDataByAP() {
   WiFi.softAPConfig(IPAddress(192,168,4,1), IPAddress(192,168,4,1), IPAddress(255,255,255,0));
   dnsServer.start(53, "*", IPAddress(192,168,4,1));
   server.begin();
-
-  String header;
 
   while (isRunning && !doIHaveData)
   {

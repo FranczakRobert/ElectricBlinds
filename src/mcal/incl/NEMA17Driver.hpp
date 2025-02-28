@@ -29,7 +29,8 @@ public:
 
     ErrorCode start() override;
     ErrorCode stop() override;
-    ErrorCode setMotorState(struct MotorStatus motorStatus);
+    DataSignalsResponse getData(DataSignals SIGNAL) override;
+    ErrorCode setData(DataSignals) override;
 
 private:
     static int position;

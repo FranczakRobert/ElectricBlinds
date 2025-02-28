@@ -30,18 +30,32 @@ ErrorCode LedDriver::stop() {
     return stopThread(TAG);
 }
 
-ErrorCode LedDriver::setLedOff()
+DataSignalsResponse LedDriver::getData(DataSignals)
 {
-    digitalWrite(WIFI_LED,LOW);
+    return DataSignalsResponse();
+}
+
+ErrorCode LedDriver::setData(DataSignals SIGNAL)
+{
+    switch (SIGNAL)
+    {
+    case S_SET_WIFI_LED_OFF:
+        digitalWrite(WIFI_LED,LOW);
+        break;
+    
+    default:
+        break;
+    }
+
     return ErrorCode();
 }
 
 void *LedDriver::run(void *args)
 {
     LedDriver* self = static_cast<LedDriver*>(args);
-    u8_t lastValue = 0;
+    s8_t lastValue = -1;
     while (self->isRunning) {
-        u8_t isWifiConnected = self->driverManager->getWifiStatus().status.isConnected;
+        u8_t isWifiConnected = self->driverManager->getDriverData(D_WIFI,S_GET_WIFI_STATUS);
         switch (isWifiConnected) {
             case WIFI_NOT_CONNECTED:
                 digitalWrite(WIFI_LED,HIGH);

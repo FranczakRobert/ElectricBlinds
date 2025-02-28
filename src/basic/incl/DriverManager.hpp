@@ -20,10 +20,8 @@ class DriverManager {
     ErrorCode initAllDrivers();
     ErrorCode deinitAllDrivers();
 
-    WifiStats getWifiStatus();
-    u8_t setWifiLedOff();
-    
-    u8_t setMotorStatus(struct MotorStatus);
+    DataSignalsResponse getDriverData(Drivers driver, DataSignals signal);
+    ErrorCode setDriverData(Drivers driver, DataSignals signal);
     
     private:
     WifiDriver wifiDriver = WifiDriver(this);

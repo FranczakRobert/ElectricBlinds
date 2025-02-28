@@ -17,6 +17,9 @@ class Driver {
     virtual ErrorCode start() = 0;
     virtual ErrorCode stop() = 0;
 
+    virtual DataSignalsResponse getData(DataSignals) = 0;
+    virtual ErrorCode setData(DataSignals) = 0;
+
     protected:
     DriverManager* driverManager;
 };

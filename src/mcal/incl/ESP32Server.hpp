@@ -37,6 +37,8 @@ class ESP32Server : public Driver , public Thread {
 
     ErrorCode start() override;
     ErrorCode stop() override;
+    DataSignalsResponse getData(DataSignals SIGNAL) override;
+    ErrorCode setData(DataSignals) override;
     ErrorCode setManager(DriverManager *drMg);
 
     ESP32Server(ESP32Server &other) = delete;

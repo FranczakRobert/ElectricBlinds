@@ -40,11 +40,15 @@ void ESP32Server::handleMotorPost() {
 
     const char* name = doc["name"];
     uint8_t val = doc["val"];
-    motorStatus.direction = strcmp(name, "ArrowUp") == 0 ? 1u : 0u;
 
-    motorStatus.status = val == 1 ? 1u : 0u;
+    strcmp(name, "ArrowUp") == 0 ? 
+      ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_UP_STATUS)
+    : ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_DOWN_STATUS);
 
-    ESP32Server::GetInstance().driverManager->setMotorStatus(motorStatus);
+    val == 1 ? 
+      ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_HOLD_STATUS)
+    : ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_RELEASE_STATUS);
+
   }
   
   ESP32Server::server.send(200);
@@ -144,6 +148,16 @@ ErrorCode ESP32Server::start(){
 ErrorCode ESP32Server::stop() {
   ESP32Server::server.stop();
   return stopThread(TAG);
+}
+
+DataSignalsResponse ESP32Server::getData(DataSignals SIGNAL)
+{
+    return DataSignalsResponse();
+}
+
+ErrorCode ESP32Server::setData(DataSignals)
+{
+    return ErrorCode();
 }
 
 ErrorCode ESP32Server::setManager(DriverManager *drMg) {

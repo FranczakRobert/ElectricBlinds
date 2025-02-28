@@ -116,7 +116,34 @@ ErrorCode NEMA17Driver::stop() {
     return stopThread(TAG);
 }
 
-ErrorCode NEMA17Driver::setMotorState(struct MotorStatus motorStatus) {
-    memcpy(&this->motor_state,&motorStatus,sizeof(motorStatus));
+DataSignalsResponse NEMA17Driver::getData(DataSignals SIGNAL)
+{
+    return DataSignalsResponse();
+}
+
+ErrorCode NEMA17Driver::setData(DataSignals SIGNAL)
+{
+    switch (SIGNAL)
+    {
+    case S_SET_NEMA_UP_STATUS:
+        motor_state.direction = ARROW_UP;
+        break;
+
+    case S_SET_NEMA_DOWN_STATUS:
+        motor_state.direction = ARROW_DOWN;
+        break;
+
+    case S_SET_NEMA_HOLD_STATUS:
+        motor_state.status = HOLD;
+        break;
+    
+    case S_SET_NEMA_RELEASE_STATUS:
+        motor_state.status = RELEASE;
+        break;
+    
+    default:
+        break;
+    }
     return ErrorCode();
 }
+
