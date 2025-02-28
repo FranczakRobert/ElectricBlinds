@@ -28,7 +28,8 @@ enum DataSignals {
 enum DataSignalsResponse {
     // WIFI
     S_WIFI_CONNECTED = 0,
-    S_WIFI_NOT_CONNECTED = 1
+    S_WIFI_NOT_CONNECTED = 1,
+    S_WIFI_CONFIG_MODE = 2
 
     // NEMA17
 };
