@@ -35,7 +35,7 @@ DataSignalsResponse LedDriver::getData(DataSignals)
     return DataSignalsResponse();
 }
 
-ErrorCode LedDriver::setData(DataSignals SIGNAL)
+ErrorCode LedDriver::setData(DataSignals SIGNAL, uint16_t count, ...)
 {
     switch (SIGNAL)
     {

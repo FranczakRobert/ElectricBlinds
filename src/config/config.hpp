@@ -1,0 +1,1 @@
+#define TRIGGER_WIFI_SEARCH 0

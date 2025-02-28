@@ -18,6 +18,7 @@ class ESP32Server : public Driver , public Thread {
     static void handleMotorPost();
     static void handleBlindsTimerPost();
     static void setRandLTimers();
+    static void handleReset();
     static void* run(void* args);
 
     private:
@@ -38,7 +39,7 @@ class ESP32Server : public Driver , public Thread {
     ErrorCode start() override;
     ErrorCode stop() override;
     DataSignalsResponse getData(DataSignals SIGNAL) override;
-    ErrorCode setData(DataSignals) override;
+    ErrorCode setData(DataSignals SIGNAL, uint16_t count, ...) override;
     ErrorCode setManager(DriverManager *drMg);
 
     ESP32Server(ESP32Server &other) = delete;

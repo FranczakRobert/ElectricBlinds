@@ -4,6 +4,7 @@
 #include "DriverManager.hpp"
 #include "NvmMemory.hpp"
 #include "Pages.hpp"
+#include "config.hpp"
 
 #include <ArduinoJson.h>
 #include <DNSServer.h>
@@ -39,10 +40,18 @@ ErrorCode WifiDriver::init() {
   Serial.println(psswd);
   vTaskDelay(1000);
 
-  WiFi.begin(
-    ssid,
-    psswd
-  );
+  if(TRIGGER_WIFI_SEARCH) {
+    WiFi.begin(
+      "ssid",
+      "psswd"
+    );
+  }
+  else {
+    WiFi.begin(
+      ssid,
+      psswd
+    );
+  }
 
   return E_OK;
 }
@@ -54,7 +63,7 @@ ErrorCode WifiDriver::deinit() {
 
 ErrorCode WifiDriver::stop() {
   if(E_OK == stopThread(TAG)) {
-    driverManager->setDriverData(D_LED,S_SET_WIFI_LED_OFF);
+    driverManager->setDriverData(D_LED,S_SET_WIFI_LED_OFF,0);
     return E_OK;
   }
   return E_NOT_OK;
@@ -66,8 +75,18 @@ DataSignalsResponse WifiDriver::getData(DataSignals SIGNAL)
   return (DataSignalsResponse)wifiStats.state;
 }
 
-ErrorCode WifiDriver::setData(DataSignals SIGNAL)
+ErrorCode WifiDriver::setData( DataSignals SIGNAL, uint16_t count, ...)
 {
+  switch (SIGNAL)
+  {
+  case S_TRIGGER_RESET:
+   
+    break;
+  
+  default:
+    break;
+  }
+  
   return ErrorCode();
 }
 
@@ -161,6 +180,9 @@ void WifiDriver::getBlindsDataByAP() {
         const char* ssid = doc["ssid"];
         const char* psswd = doc["password"];
 
+        u32_t max = doc["max"];
+        u32_t min = doc["min"];
+
         doIHaveData = true;
         WiFi.begin(String(ssid), String(psswd));
         uint8_t counter = 0;
@@ -169,12 +191,15 @@ void WifiDriver::getBlindsDataByAP() {
 
           if (WiFi.status() == WL_CONNECTED){
             Serial.println(WiFi.localIP());
-            wifiStats.status.isConnected = WIFI_CONNECTED;
+            wifiStats.state = WIFI_CONNECTED;
             client.flush();
             client.stop();
             server.close();
             WiFi.softAPdisconnect();
-            
+
+            driverManager->setDriverData(D_NEMA17,S_SET_NEMA_MAX,1,max);
+            driverManager->setDriverData(D_NEMA17,S_SET_NEMA_MAX,1,min);
+
             NvmMemory::getInstance().writeToNvm("CREDENTIALS","SSID",ssid);
             NvmMemory::getInstance().writeToNvm("CREDENTIALS","PSSWD",psswd);
             

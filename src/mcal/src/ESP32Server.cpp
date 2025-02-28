@@ -42,12 +42,12 @@ void ESP32Server::handleMotorPost() {
     uint8_t val = doc["val"];
 
     strcmp(name, "ArrowUp") == 0 ? 
-      ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_UP_STATUS)
-    : ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_DOWN_STATUS);
+      ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_UP_STATUS,0)
+    : ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_DOWN_STATUS,0);
 
     val == 1 ? 
-      ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_HOLD_STATUS)
-    : ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_RELEASE_STATUS);
+      ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_HOLD_STATUS,0)
+    : ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_RELEASE_STATUS,0);
 
   }
   
@@ -122,12 +122,17 @@ void ESP32Server::setRandLTimers() {
   vSemaphoreDelete(nvmSemaphore);
 }
 
+void ESP32Server::handleReset()
+{
+  ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_TRIGGER_RESET,0);
+}
 
 ErrorCode ESP32Server::init() {
   ESP32Server::server.on("/", HTTP_GET, handleRoot);
   ESP32Server::server.on("/timeUpdate", HTTP_GET, setRandLTimers);
   ESP32Server::server.on("/motorControll", HTTP_POST, handleMotorPost);
   ESP32Server::server.on("/blindsTime", HTTP_POST, handleBlindsTimerPost);
+  ESP32Server::server.on("/reset", HTTP_GET, handleReset);
   ESP32Server::server.begin(8080);
   return E_OK;
 }
@@ -155,7 +160,7 @@ DataSignalsResponse ESP32Server::getData(DataSignals SIGNAL)
     return DataSignalsResponse();
 }
 
-ErrorCode ESP32Server::setData(DataSignals)
+ErrorCode ESP32Server::setData(DataSignals SIGNAL, uint16_t count, ...)
 {
     return ErrorCode();
 }

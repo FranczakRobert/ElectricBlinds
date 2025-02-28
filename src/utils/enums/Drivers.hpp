@@ -12,17 +12,19 @@ enum Drivers {
 enum DataSignals {
     // WIFI
     S_GET_WIFI_STATUS = 0,
+    S_SET_WIFI_LED_OFF,
 
     //LED
-    S_SET_WIFI_LED_OFF = 1,
+    S_TRIGGER_RESET,
 
     //NEMA17
-    S_SET_NEMA_UP_STATUS =2,
-    S_SET_NEMA_DOWN_STATUS = 3,
+    S_SET_NEMA_UP_STATUS,
+    S_SET_NEMA_DOWN_STATUS,
+    S_SET_NEMA_HOLD_STATUS,
+    S_SET_NEMA_RELEASE_STATUS,
 
-    S_SET_NEMA_HOLD_STATUS = 4,
-    S_SET_NEMA_RELEASE_STATUS = 5,
-
+    S_SET_NEMA_MAX,
+    S_SET_NEMA_MIN,
 };
 
 enum DataSignalsResponse {

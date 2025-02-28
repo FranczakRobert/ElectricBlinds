@@ -21,7 +21,7 @@ class DriverManager {
     ErrorCode deinitAllDrivers();
 
     DataSignalsResponse getDriverData(Drivers driver, DataSignals signal);
-    ErrorCode setDriverData(Drivers driver, DataSignals signal);
+    ErrorCode setDriverData(Drivers driver, DataSignals signal ,u16_t count,  ...);
     
     private:
     WifiDriver wifiDriver = WifiDriver(this);

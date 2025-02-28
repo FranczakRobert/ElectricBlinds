@@ -101,11 +101,14 @@ const String mainPage = R"rawliteral(
       </div>
   
       <button id="setButton">SET</button>
+
+      <button id="resetButton">TRIGGER RESET</button>
   
       <script>
   let upButton = document.getElementById('upButton');
   let downButton = document.getElementById('downButton');
   let setButton = document.getElementById('setButton');
+  let setResetButton = document.getElementById('resetButton');
   
   // Zmienna do przechowywania pobranych danych
   let timeData = null;
@@ -208,7 +211,17 @@ const String mainPage = R"rawliteral(
       .then(response => response.text())
       .catch(error => console.error('Error:', error));
   });
-  
+
+  setResetButton.addEventListener('click', function() {
+        fetch('/reset', {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+      })
+      .then(response => response.text())
+      .catch(error => console.error('Error:', error));
+  });
       </script>
     </body>
     </html>)rawliteral";
@@ -230,13 +243,19 @@ const String configPage =
     "<input type='text' id='ssid' name='ssid'><br>"
     "<label for='password'>Haslo:</label>"
     "<input type='password' id='password' name='password'><br>"
-    "<button type='button' onclick='sendData()'>POŁĄCZ</button>"
+    "<label for='Max'>Max:</label>"
+    "<input type='number' id='max' name='max'><br>"
+    "<label for='Min'>Min:</label>"
+    "<input type='number' id='min' name='min'><br>"
+    "<button type='button' onclick='sendData()'>Ustaw</button>"
     "</form>"
     "<script>"
     "function sendData() {"
     "  var ssid = document.getElementById('ssid').value;"
     "  var password = document.getElementById('password').value;"
-    "  var jsonData = JSON.stringify({ssid: ssid, password: password});"
+    "  var min = document.getElementById('min').value;"
+    "  var max = document.getElementById('max').value;"
+    "  var jsonData = JSON.stringify({ssid: ssid, password: password, min: parseInt(min,10), max: parseInt(max,10)});"
     "  var xhr = new XMLHttpRequest();"
     "  xhr.open('POST', '/submit', true);"
     "  xhr.setRequestHeader('Content-Type', 'application/json');"
@@ -244,6 +263,8 @@ const String configPage =
     "  alert('Dane zapisane! Poczekaj do 10 sekund połączenie.');"
     "  document.getElementById('ssid').value = '';"
     "  document.getElementById('password').value = '';"
+    "  document.getElementById('min').value = '';"
+    "  document.getElementById('max').value = '';"
     "}" 
     "</script>"
     "</body></html>";

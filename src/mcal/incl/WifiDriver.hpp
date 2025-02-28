@@ -39,7 +39,7 @@ public:
     ErrorCode start() override;
     ErrorCode stop() override;
     DataSignalsResponse getData(DataSignals SIGNAL) override;
-    ErrorCode setData(DataSignals) override;
+    ErrorCode setData(DataSignals SIGNAL, uint16_t count, ...) override;
 
     private:
     WifiStatsU wifiStats = {0};

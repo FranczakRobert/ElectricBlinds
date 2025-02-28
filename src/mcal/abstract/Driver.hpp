@@ -18,7 +18,8 @@ class Driver {
     virtual ErrorCode stop() = 0;
 
     virtual DataSignalsResponse getData(DataSignals) = 0;
-    virtual ErrorCode setData(DataSignals) = 0;
+    virtual ErrorCode setData(DataSignals SIGNAL, uint16_t count, ...) = 0;
+    
 
     protected:
     DriverManager* driverManager;

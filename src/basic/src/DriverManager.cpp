@@ -48,8 +48,21 @@ DataSignalsResponse DriverManager::getDriverData(Drivers driver,DataSignals sign
     return drivers_array[driver]->getData(signal);
 }
 
-ErrorCode DriverManager::setDriverData(Drivers driver, DataSignals signal) {
-    drivers_array[driver]->setData(signal);
+ErrorCode DriverManager::setDriverData(Drivers driver, DataSignals signal ,u16_t count = 0, ...) {
+    s32_t result = -1;
+
+    if(count > 0) {
+        va_list args;
+        va_start(args, count);
+        
+        for (int i = 0; i < count; ++i) {
+            result = va_arg(args, int);
+            drivers_array[driver]->setData(signal,1,result);
+        }            
+        va_end(args);
+        return ErrorCode();
+    }
+    drivers_array[driver]->setData(signal,0);
     return ErrorCode();
 }
 

@@ -30,7 +30,7 @@ public:
     ErrorCode start() override;
     ErrorCode stop() override;
     DataSignalsResponse getData(DataSignals SIGNAL) override;
-    ErrorCode setData(DataSignals) override;
+    ErrorCode setData(DataSignals SIGNAL, uint16_t count, ...) override;
 
 private:
     static int position;
@@ -39,6 +39,9 @@ private:
     const uint8_t IN2 = 27;
     const uint8_t IN3 = 26;
     const uint8_t IN4 = 25;
+
+    uint32_t position_MAX;
+    uint32_t position_MIN;
 
     ErrorCode motorHigh();
     ErrorCode motorLow();

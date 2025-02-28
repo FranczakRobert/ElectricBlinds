@@ -17,9 +17,11 @@ NEMA17Driver::~NEMA17Driver() {
 }
 
 ErrorCode NEMA17Driver::init() {
-    isRunning = 1;
     myStepper.setSpeed(30);
     motor_state = {RELEASE,ARROW_UP};
+
+    position_MAX = 300;
+    position_MIN = 0;
 
     String str = NvmMemory::getInstance().readFromNvm("ESP32","MOTOR_POSITION");
     if(!str.equals("")) {
@@ -28,8 +30,6 @@ ErrorCode NEMA17Driver::init() {
     else{
         NEMA17Driver::position = 0;
     }
-    Serial.print("!!!!!!!!!!!!");
-    Serial.println(position);
     return ErrorCode();
 }
 
@@ -92,19 +92,19 @@ ErrorCode NEMA17Driver::motorHigh() {
     digitalWrite(IN4, LOW);
 
     if(1 == motor_state.direction) {
-        if(position < POSITION_MIN) {
-            position = POSITION_MIN;
+        if(position < position_MIN) {
+            position = position_MIN;
         }
-        if(position < POSITION_MAX) {
+        if(position < position_MAX) {
             myStepper.step(10);
             position++;
         }
         
     }else if(0 == motor_state.direction) {
-        if(position > POSITION_MAX) {
-            position = POSITION_MAX;
+        if(position > position_MAX) {
+            position = position_MAX;
         }
-        if(position > POSITION_MIN) {
+        if(position > position_MIN) {
             myStepper.step(-10);
             position--;
         }
@@ -121,7 +121,7 @@ DataSignalsResponse NEMA17Driver::getData(DataSignals SIGNAL)
     return DataSignalsResponse();
 }
 
-ErrorCode NEMA17Driver::setData(DataSignals SIGNAL)
+ErrorCode NEMA17Driver::setData( DataSignals SIGNAL, uint16_t count, ...)
 {
     switch (SIGNAL)
     {
