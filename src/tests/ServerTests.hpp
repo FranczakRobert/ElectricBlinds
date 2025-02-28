@@ -2,9 +2,6 @@
 
 #include "test.hpp"
 
-// TODO WEŹ TO W KONCU OGARNIJ 
-
-
 class ServerTests {
     DriverManager driverManager;
     public:
