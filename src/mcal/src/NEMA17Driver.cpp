@@ -140,6 +140,31 @@ ErrorCode NEMA17Driver::setData( DataSignals SIGNAL, uint16_t count, ...)
     case S_SET_NEMA_RELEASE_STATUS:
         motor_state.status = RELEASE;
         break;
+
+    case S_SET_NEMA_MAX:
+        if(count > 0) {
+            va_list args;
+            va_start(args, count);
+            for (int i = 0; i < count; ++i) {
+                position_MAX = va_arg(args, int);
+            }            
+            va_end(args);
+            vTaskDelay(1000);
+            Serial.println(position_MAX);
+        }
+
+    case S_SET_NEMA_MIN:
+
+        if(count > 0) {
+            va_list args;
+            va_start(args, count);
+            for (int i = 0; i < count; ++i) {
+                position_MIN = va_arg(args, int);
+            }            
+            va_end(args);
+            vTaskDelay(1000);
+            Serial.println(position_MIN);
+        }
     
     default:
         break;

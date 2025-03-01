@@ -198,7 +198,7 @@ void WifiDriver::getBlindsDataByAP() {
             WiFi.softAPdisconnect();
 
             driverManager->setDriverData(D_NEMA17,S_SET_NEMA_MAX,1,max);
-            driverManager->setDriverData(D_NEMA17,S_SET_NEMA_MAX,1,min);
+            driverManager->setDriverData(D_NEMA17,S_SET_NEMA_MIN,1,min);
 
             NvmMemory::getInstance().writeToNvm("CREDENTIALS","SSID",ssid);
             NvmMemory::getInstance().writeToNvm("CREDENTIALS","PSSWD",psswd);
