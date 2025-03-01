@@ -63,7 +63,7 @@ ErrorCode WifiDriver::deinit() {
 
 ErrorCode WifiDriver::stop() {
   if(E_OK == stopThread(TAG)) {
-    driverManager->setDriverData(D_LED,S_SET_WIFI_LED_OFF,0);
+    driverManager->setDriverData(D_LED,S_SET_WIFI_LED_OFF);
     return E_OK;
   }
   return E_NOT_OK;
@@ -181,7 +181,6 @@ void WifiDriver::getBlindsDataByAP() {
         const char* psswd = doc["password"];
 
         u32_t max = doc["max"];
-        u32_t min = doc["min"];
 
         doIHaveData = true;
         WiFi.begin(String(ssid), String(psswd));
@@ -198,7 +197,6 @@ void WifiDriver::getBlindsDataByAP() {
             WiFi.softAPdisconnect();
 
             driverManager->setDriverData(D_NEMA17,S_SET_NEMA_MAX,1,max);
-            driverManager->setDriverData(D_NEMA17,S_SET_NEMA_MIN,1,min);
 
             NvmMemory::getInstance().writeToNvm("CREDENTIALS","SSID",ssid);
             NvmMemory::getInstance().writeToNvm("CREDENTIALS","PSSWD",psswd);

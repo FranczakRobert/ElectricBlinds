@@ -42,12 +42,12 @@ void ESP32Server::handleMotorPost() {
     uint8_t val = doc["val"];
 
     strcmp(name, "ArrowUp") == 0 ? 
-      ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_UP_STATUS,0)
-    : ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_DOWN_STATUS,0);
+      ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_UP_STATUS)
+    : ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_DOWN_STATUS);
 
     val == 1 ? 
-      ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_HOLD_STATUS,0)
-    : ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_RELEASE_STATUS,0);
+      ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_HOLD_STATUS)
+    : ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_SET_NEMA_RELEASE_STATUS);
 
   }
   
@@ -124,7 +124,7 @@ void ESP32Server::setRandLTimers() {
 
 void ESP32Server::handleReset()
 {
-  ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_TRIGGER_RESET,0);
+  ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_TRIGGER_RESET);
 }
 
 ErrorCode ESP32Server::init() {
