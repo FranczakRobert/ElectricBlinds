@@ -133,7 +133,7 @@ void ESP32Server::setRandLTimers() {
 
 void ESP32Server::handleReset()
 {
-  ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_TRIGGER_RESET);
+  ESP32Server::GetInstance().driverManager->setDriverData(D_WIFI,S_TRIGGER_RESET);
 }
 
 ErrorCode ESP32Server::init() {
