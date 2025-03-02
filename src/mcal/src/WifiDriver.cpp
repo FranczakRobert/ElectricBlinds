@@ -80,7 +80,9 @@ ErrorCode WifiDriver::setData( DataSignals SIGNAL, uint16_t count, ...)
   switch (SIGNAL)
   {
   case S_TRIGGER_RESET:
-   
+      Serial.println("[Wifi] [setData] - RESETING");
+      wifiStats.state = WIFI_CONFIG_MODE;
+      WiFi.disconnect();
     break;
   
   default:
@@ -112,10 +114,10 @@ void* WifiDriver::run(void* args) {
         counter = 0;
         break;
       
-      case WL_CONNECTION_LOST:
-        self->wifiStats.state = WIFI_NOT_CONNECTED;
-        WiFi.reconnect();
-        break;
+      // case WL_CONNECTION_LOST:
+      //   self->wifiStats.state = WIFI_NOT_CONNECTED;
+      //   WiFi.reconnect();
+      //   break;
       
       case WL_NO_SSID_AVAIL:
         self->wifiStats.state = WIFI_CONFIG_MODE;

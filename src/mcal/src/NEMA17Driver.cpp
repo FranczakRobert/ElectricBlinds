@@ -22,7 +22,7 @@ ErrorCode NEMA17Driver::init() {
 
     position_MAX = 300;
     position_MIN = 0;
-
+    String MAX = NvmMemory::getInstance().readFromNvm("max", "maximum");
     String str = NvmMemory::getInstance().readFromNvm("ESP32","MOTOR_POSITION");
     if(!str.equals("")) {
         NEMA17Driver::position = str.toInt();
@@ -30,6 +30,15 @@ ErrorCode NEMA17Driver::init() {
     else{
         NEMA17Driver::position = 0;
     }
+
+    if(!MAX.equals("")) {
+        NEMA17Driver::position_MAX = MAX.toInt();
+        ESP32Server::GetInstance().max = MAX;
+    }
+    else{
+        NEMA17Driver::position = 0;
+    }
+    
     return ErrorCode();
 }
 
@@ -47,7 +56,6 @@ void *NEMA17Driver::run(void *args)
 {
     NEMA17Driver* self = static_cast<NEMA17Driver*>(args);
     while (self->isRunning) {
-        
         if(self->motor_state.status) {
             self->motorHigh();
         }
@@ -148,11 +156,12 @@ ErrorCode NEMA17Driver::setData( DataSignals SIGNAL, uint16_t count, ...)
             for (int i = 0; i < count; ++i) {
                 position_MAX = va_arg(args, int);
             }
-            va_end(args);
-            static char buffer[4];
-            std::snprintf(buffer, sizeof(buffer), "%d",position_MAX);
-            NvmMemory::getInstance().writeToNvm("MINMAX","MAX",buffer);
-            vTaskDelay(1000);
+            va_end(args);            
+            std::string s = std::to_string(position_MAX);
+            char const *pchar = s.c_str();
+            NvmMemory::getInstance().writeToNvm("max","maximum",pchar);
+            ESP32Server::GetInstance().max = position_MAX;
+            vTaskDelay(500 / portTICK_PERIOD_MS);
         }
         
         break;

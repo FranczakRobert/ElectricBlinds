@@ -17,6 +17,7 @@ struct payload {
 WebServer ESP32Server::server(8080);
 String ESP32Server::loweringTimeVal = "";
 String ESP32Server::raisingTimeVal = "";
+String ESP32Server::max = "";
 SemaphoreHandle_t nvmSemaphore;
 
 ESP32Server::ESP32Server() {
@@ -99,19 +100,25 @@ void readFromNVMTask(void* pvParameters) {
 }
 
 void ESP32Server::setRandLTimers() {
-  nvmSemaphore = xSemaphoreCreateBinary();
+  if (nvmSemaphore == NULL) {
+    nvmSemaphore = xSemaphoreCreateBinary();
+    Serial.println("[INFO] Created nvmSemaphore.");
+  }
 
   if (&ESP32Server::server == nullptr) {
     Serial.println("ERROR: Server is not initialized.");
     return;
   }
 
-  xTaskCreate(readFromNVMTask, "ReadFromNVMTask", 2048, (void*)&ESP32Server::GetInstance(), 1, NULL);
+  if (xTaskCreate(readFromNVMTask, "ReadFromNVMTask", 2048, (void*)&ESP32Server::GetInstance(), 1, NULL) != pdPASS) {
+    Serial.println("[ERROR] Failed to create ReadFromNVMTask");
+  }
 
-  if(pdTRUE == xSemaphoreTake(nvmSemaphore, portMAX_DELAY)) {
+  if (pdTRUE == xSemaphoreTake(nvmSemaphore, portMAX_DELAY)) {
     JsonDocument doc;
     doc["loweringTime"] = ESP32Server::GetInstance().loweringTimeVal.isEmpty() ? "00:00" : ESP32Server::GetInstance().loweringTimeVal;
     doc["raisingTime"] = ESP32Server::GetInstance().raisingTimeVal.isEmpty() ? "00:00" : ESP32Server::GetInstance().raisingTimeVal;
+    doc["max"] = ESP32Server::GetInstance().max.isEmpty() ? "300" : ESP32Server::GetInstance().max;
 
     String response;
     serializeJson(doc, response);
@@ -120,7 +127,9 @@ void ESP32Server::setRandLTimers() {
   }
 
   vSemaphoreDelete(nvmSemaphore);
+  nvmSemaphore = NULL;
 }
+
 
 void ESP32Server::handleReset()
 {

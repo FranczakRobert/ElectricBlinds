@@ -30,6 +30,7 @@ class ESP32Server : public Driver , public Thread {
     static WebServer server;
     static String loweringTimeVal;
     static String raisingTimeVal;
+    static String max;
 
     static ESP32Server& GetInstance() {
         static ESP32Server instance;

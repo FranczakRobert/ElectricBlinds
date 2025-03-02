@@ -99,7 +99,9 @@ const String mainPage = R"rawliteral(
           <label for="raisingTime">Raising the blinds</label>
           <input type="time" id="raisingTime" >
       </div>
-  
+
+      <div id="maxValue">Max: Loading...</div>  
+
       <button id="setButton">SET</button>
 
       <button id="resetButton">TRIGGER RESET</button>
@@ -188,6 +190,7 @@ const String mainPage = R"rawliteral(
                   // Ustawianie wartości z JSON na inputach
                   document.getElementById('loweringTime').value = timeData.loweringTime;
                   document.getElementById('raisingTime').value = timeData.raisingTime;
+                  document.getElementById('maxValue').textContent = `Max: ${timeData.max}`;
               })
               .catch(error => console.error('Error:', error));
       }
