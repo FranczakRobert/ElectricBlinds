@@ -22,6 +22,7 @@ const String mainPage = R"rawliteral(
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
+                position: relative;
             }
             h1 {
                 margin-bottom: 20px;
@@ -82,6 +83,33 @@ const String mainPage = R"rawliteral(
             #setButton:hover {
                 background-color: #28A428; /* Ciemniejszy zielony po najechaniu */
             }
+            /* Stylizacja przycisku TRIGGER RESET */
+            #resetButton {
+                position: absolute; /* Ustawienie przycisku w lewym górnym rogu */
+                top: 20px;
+                left: 20px;
+                background-color: #FF0000; /* Czerwony kolor */
+                color: #fff;
+                border: none;
+                padding: 15px 30px;
+                font-size: 18px;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+                width: 180px; /* Szerokość przycisku */
+                height: 50px; /* Wysokość przycisku */
+                user-select: none;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                touch-action: manipulation;
+            }
+            #resetButton:hover {
+                background-color: #CC0000; /* Jaśniejszy czerwony po najechaniu */
+            }
+            #resetButton:active {
+                background-color: #B30000; /* Ciemniejszy czerwony po kliknięciu */
+            }
         </style>
     </head>
     <body>
@@ -104,7 +132,7 @@ const String mainPage = R"rawliteral(
 
       <button id="setButton">SET</button>
 
-      <button id="resetButton">TRIGGER RESET</button>
+      <button id="resetButton">RESET</button>
   
       <script>
   let upButton = document.getElementById('upButton');
