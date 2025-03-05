@@ -1,12 +1,13 @@
 #ifndef DRIVERS_HPP
 #define DRIVERS_HPP
 
-#define DRIVERS_NUMBER 3
+#define DRIVERS_NUMBER 4
 
 enum Drivers {
     D_LED = 0,
-    D_WIFI = 1,
-    D_NEMA17 = 2,
+    D_SCHEDULER = 1,
+    D_WIFI = 2,
+    D_NEMA17 = 3,
 };
 
 enum DataSignals {
@@ -22,9 +23,12 @@ enum DataSignals {
     S_SET_NEMA_DOWN_STATUS,
     S_SET_NEMA_HOLD_STATUS,
     S_SET_NEMA_RELEASE_STATUS,
-
+    S_SET_NEMA_WORKING_TIME,
     S_SET_NEMA_MAX,
     S_SET_NEMA_MIN,
+
+    //SCHEDULER
+    S_FETCH_DATA,
 };
 
 enum DataSignalsResponse {

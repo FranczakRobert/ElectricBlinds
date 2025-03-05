@@ -5,10 +5,8 @@
 #include "LedDriver.hpp"
 #include "WifiDriver.hpp"
 #include "NEMA17Driver.hpp"
-
+#include "Scheduler.hpp"
 #include "MotorStatus.hpp"
-
-#define WIFI_LED  21
 
 class DriverManager {
     public:
@@ -19,16 +17,17 @@ class DriverManager {
     ErrorCode stopAllDrivers();
     ErrorCode initAllDrivers();
     ErrorCode deinitAllDrivers();
+    ErrorCode notifyScheduler();
 
     DataSignalsResponse getDriverData(Drivers driver, DataSignals signal);
     ErrorCode setDriverData(Drivers driver, DataSignals signal);
     ErrorCode setDriverData(Drivers driver, DataSignals signal ,u16_t count,  ...);
 
-    
     private:
     WifiDriver wifiDriver = WifiDriver(this);
     LedDriver ledDriver = LedDriver(this);
     NEMA17Driver stepperDriver = NEMA17Driver(this);
+    Scheduler scheduler = Scheduler(this);
 
     Driver* drivers_array[DRIVERS_NUMBER];
 

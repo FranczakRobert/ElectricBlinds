@@ -4,6 +4,7 @@ DriverManager::DriverManager() {
     drivers_array[D_LED] = &ledDriver;
     drivers_array[D_WIFI] = &wifiDriver;
     drivers_array[D_NEMA17] = &stepperDriver;
+    drivers_array[D_SCHEDULER] = &scheduler;
 }
 
 ErrorCode DriverManager::initAllDrivers() {
@@ -42,6 +43,11 @@ ErrorCode DriverManager::deinitAllDrivers() {
         }
     }
     return E_OK;
+}
+ErrorCode DriverManager::notifyScheduler()
+{
+    scheduler.setFetchData();   
+    return ErrorCode();
 }
 
 DataSignalsResponse DriverManager::getDriverData(Drivers driver,DataSignals signal) {

@@ -38,6 +38,8 @@ ErrorCode NEMA17Driver::init() {
     else{
         NEMA17Driver::position = 0;
     }
+
+
     
     return ErrorCode();
 }
@@ -147,6 +149,10 @@ ErrorCode NEMA17Driver::setData( DataSignals SIGNAL, uint16_t count, ...)
     
     case S_SET_NEMA_RELEASE_STATUS:
         motor_state.status = RELEASE;
+        break;
+
+    case S_SET_NEMA_WORKING_TIME:
+        // TODO 
         break;
 
     case S_SET_NEMA_MAX:

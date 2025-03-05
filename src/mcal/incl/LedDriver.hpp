@@ -3,6 +3,7 @@
 
 #include "Driver.hpp"
 #include "Thread.hpp"
+#define WIFI_LED  21
 
 class DriverManager;
 

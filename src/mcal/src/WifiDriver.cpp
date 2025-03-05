@@ -94,7 +94,7 @@ ErrorCode WifiDriver::setData( DataSignals SIGNAL, uint16_t count, ...)
 
 void* WifiDriver::run(void* args) {
   WifiDriver* self = static_cast<WifiDriver*>(args);
-  uint8_t counter = 0;
+  uint8_t counter = 1;
   
   while (self->isRunning) {
     switch (WiFi.status())
@@ -111,6 +111,11 @@ void* WifiDriver::run(void* args) {
       case WL_CONNECTED:
         Serial.println(WiFi.localIP());
         self->wifiStats.state = WIFI_CONNECTED;
+        if(counter != 0) {
+          self->driverManager->setDriverData(D_SCHEDULER,S_FETCH_DATA);
+          Serial.println("[WifiDriver] [INFO] [run]");
+          // self->driverManager->notifyScheduler(); // Tutaj jakas zmienna zmienic. zeby to w jednym watku nie latalo
+        }
         counter = 0;
         break;
       
@@ -202,7 +207,9 @@ void WifiDriver::getBlindsDataByAP() {
 
             NvmMemory::getInstance().writeToNvm("CREDENTIALS","SSID",ssid);
             NvmMemory::getInstance().writeToNvm("CREDENTIALS","PSSWD",psswd);
-            
+            // driverManager->notifyScheduler();
+            Serial.println("[WifiDriver] [INFO] [getBlindsDataByAP]");
+            driverManager->setDriverData(D_SCHEDULER,S_FETCH_DATA);
             break;
           }
 

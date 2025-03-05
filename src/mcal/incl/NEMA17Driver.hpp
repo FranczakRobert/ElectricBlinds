@@ -32,10 +32,9 @@ public:
     DataSignalsResponse getData(DataSignals SIGNAL) override;
     ErrorCode setData(DataSignals SIGNAL, uint16_t count, ...) override;
 
-    String MAX;
-
 private:
     static int position;
+    
 
     const uint8_t IN1 = 14;
     const uint8_t IN2 = 27;

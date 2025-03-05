@@ -12,6 +12,7 @@ class ESP32Server : public Driver , public Thread {
     protected:
 
     ESP32Server();
+    
     ~ESP32Server() {}
 
     static void handleRoot();
