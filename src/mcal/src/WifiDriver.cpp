@@ -113,8 +113,6 @@ void* WifiDriver::run(void* args) {
         self->wifiStats.state = WIFI_CONNECTED;
         if(counter != 0) {
           self->driverManager->setDriverData(D_SCHEDULER,S_FETCH_DATA);
-          Serial.println("[WifiDriver] [INFO] [run]");
-          // self->driverManager->notifyScheduler(); // Tutaj jakas zmienna zmienic. zeby to w jednym watku nie latalo
         }
         counter = 0;
         break;

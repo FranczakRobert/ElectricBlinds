@@ -5,6 +5,8 @@
 #include "Thread.hpp"
 #include "Driver.hpp"
 #include "ErrorCode.hpp"
+#define HOUR 0
+#define MIN 1
 
 class DriverManager;
 
@@ -28,6 +30,7 @@ class Scheduler : public Driver ,public Thread {
 
   private:
   volatile bool fetchData;
+  uint32_t time[3];
   DriverManager* driverManager;
 
   void fetchHour();
