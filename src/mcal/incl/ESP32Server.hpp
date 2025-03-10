@@ -32,7 +32,7 @@ class ESP32Server : public Driver , public Thread {
     static String loweringTimeVal;
     static String raisingTimeVal;
     static String max;
-
+    static pthread_mutex_t timeValMutex;
     static ESP32Server& GetInstance() {
         static ESP32Server instance;
         return instance;

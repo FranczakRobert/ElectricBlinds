@@ -10,6 +10,10 @@
         "tuple": "cpp",
         "typeinfo": "cpp",
         "new": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "string_view": "cpp",
+        "random": "cpp",
+        "istream": "cpp",
+        "limits": "cpp"
     }
 }

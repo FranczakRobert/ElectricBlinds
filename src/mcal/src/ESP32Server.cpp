@@ -18,7 +18,8 @@ WebServer ESP32Server::server(8080);
 String ESP32Server::loweringTimeVal = "";
 String ESP32Server::raisingTimeVal = "";
 String ESP32Server::max = "";
-SemaphoreHandle_t nvmSemaphore;
+pthread_mutex_t ESP32Server::timeValMutex = PTHREAD_MUTEX_INITIALIZER;
+
 
 ESP32Server::ESP32Server() {
   TAG = "SERVER";
@@ -55,21 +56,6 @@ void ESP32Server::handleMotorPost() {
   ESP32Server::server.send(200);
 }
 
-
-void writeToNVMTask(void* pvParameters) {
-  
-  struct payload payloadCopy = *(static_cast<struct payload*>(pvParameters));
-
-  const char* loweringTimeStr = payloadCopy.loweringTime.c_str();
-  const char* raisingTimeStr = payloadCopy.raisingTime.c_str();
-
-  NvmMemory::getInstance().writeToNvm("TIME", "L", loweringTimeStr);
-  NvmMemory::getInstance().writeToNvm("TIME", "R", raisingTimeStr);
-
-  vTaskDelay(100 / portTICK_PERIOD_MS);
-  vTaskDelete(NULL);
-}
-
 void ESP32Server::handleBlindsTimerPost() {
   if (ESP32Server::server.hasArg("plain")) {
     JsonDocument doc;
@@ -84,37 +70,27 @@ void ESP32Server::handleBlindsTimerPost() {
     taskPayload.loweringTime = String(loweringTime);
     taskPayload.raisingTime = String(raisingTime);
 
-    xTaskCreate(writeToNVMTask, "WriteToNVMTask", 2048, (void*)&taskPayload, 1, NULL);
+    const char* loweringTimeStr = taskPayload.loweringTime.c_str();
+    const char* raisingTimeStr = taskPayload.raisingTime.c_str();
+
+    pthread_mutex_lock(&timeValMutex);
+    NvmMemory::getInstance().writeToNvm("TIME", "L", loweringTimeStr);
+    NvmMemory::getInstance().writeToNvm("TIME", "R", raisingTimeStr);
+    pthread_mutex_unlock(&timeValMutex);
   }
-}
-
-void readFromNVMTask(void* pvParameters) {
-  ESP32Server* server = static_cast<ESP32Server*>(pvParameters);
-
-  server->GetInstance().loweringTimeVal = NvmMemory::getInstance().readFromNvm("TIME", "L");
-  server->GetInstance().raisingTimeVal = NvmMemory::getInstance().readFromNvm("TIME", "R");
-
-  xSemaphoreGive(nvmSemaphore);
-
-  vTaskDelete(NULL);
 }
 
 void ESP32Server::setRandLTimers() {
-  if (nvmSemaphore == NULL) {
-    nvmSemaphore = xSemaphoreCreateBinary();
-    Serial.println("[INFO] Created nvmSemaphore.");
-  }
 
   if (&ESP32Server::server == nullptr) {
     Serial.println("ERROR: Server is not initialized.");
     return;
   }
-
-  if (xTaskCreate(readFromNVMTask, "ReadFromNVMTask", 2048, (void*)&ESP32Server::GetInstance(), 1, NULL) != pdPASS) {
-    Serial.println("[ERROR] Failed to create ReadFromNVMTask");
-  }
-
-  if (pdTRUE == xSemaphoreTake(nvmSemaphore, portMAX_DELAY)) {
+  pthread_mutex_lock(&timeValMutex);
+  GetInstance().loweringTimeVal = NvmMemory::getInstance().readFromNvm("TIME", "L");
+  GetInstance().raisingTimeVal = NvmMemory::getInstance().readFromNvm("TIME", "R");
+  pthread_mutex_unlock(&timeValMutex);
+  
     JsonDocument doc;
     doc["loweringTime"] = ESP32Server::GetInstance().loweringTimeVal.isEmpty() ? "00:00" : ESP32Server::GetInstance().loweringTimeVal;
     doc["raisingTime"] = ESP32Server::GetInstance().raisingTimeVal.isEmpty() ? "00:00" : ESP32Server::GetInstance().raisingTimeVal;
@@ -124,10 +100,6 @@ void ESP32Server::setRandLTimers() {
     serializeJson(doc, response);
 
     ESP32Server::GetInstance().server.send(200, "application/json", response);
-  }
-
-  vSemaphoreDelete(nvmSemaphore);
-  nvmSemaphore = NULL;
 }
 
 
