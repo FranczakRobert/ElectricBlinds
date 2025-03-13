@@ -112,7 +112,7 @@ void* WifiDriver::run(void* args) {
         Serial.println(WiFi.localIP());
         self->wifiStats.state = WIFI_CONNECTED;
         if(counter != 0) {
-          self->driverManager->setDriverData(D_SCHEDULER,S_FETCH_DATA);
+          self->driverManager->setDriverData(D_SCHEDULER,S_SCHEDULER_FETCH_DATA);
         }
         counter = 0;
         break;
@@ -207,7 +207,7 @@ void WifiDriver::getBlindsDataByAP() {
             NvmMemory::getInstance().writeToNvm("CREDENTIALS","PSSWD",psswd);
             // driverManager->notifyScheduler();
             Serial.println("[WifiDriver] [INFO] [getBlindsDataByAP]");
-            driverManager->setDriverData(D_SCHEDULER,S_FETCH_DATA);
+            driverManager->setDriverData(D_SCHEDULER,S_SCHEDULER_FETCH_DATA);
             break;
           }
 

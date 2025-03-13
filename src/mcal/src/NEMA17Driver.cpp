@@ -151,10 +151,6 @@ ErrorCode NEMA17Driver::setData( DataSignals SIGNAL, uint16_t count, ...)
         motor_state.status = RELEASE;
         break;
 
-    case S_SET_NEMA_WORKING_TIME:
-       
-        break;
-
     case S_SET_NEMA_MAX:
         if(count > 0) {
             va_list args;
@@ -172,21 +168,12 @@ ErrorCode NEMA17Driver::setData( DataSignals SIGNAL, uint16_t count, ...)
         
         break;
 
-    case S_SET_NEMA_MIN:
+    case S_TRIGGER_NEMA_LOWERING:
+        Serial.println("NEMA - S_TRIGGER_NEMA_LOWERING");
+        break;
 
-        // if(count > 0) {
-            
-        //     va_list args;
-        //     va_start(args, count);
-        //     for (int i = 0; i < count; ++i) {
-        //         position_MIN = va_arg(args, int);
-        //     }            
-        //     va_end(args);
-        //     static char buffer[3];
-        //     std::snprintf(buffer, sizeof(buffer), "%d",position_MIN);
-        //     NvmMemory::getInstance().writeToNvm("MINMAX","MIN",buffer);
-        //     vTaskDelay(1000);
-        // }
+    case S_TRIGGER_NEM_RAISING:
+        Serial.println("NEMA - S_TRIGGER_NEM_RAISING");
         break;
     
     default:

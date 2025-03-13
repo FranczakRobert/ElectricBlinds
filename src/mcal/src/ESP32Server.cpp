@@ -66,17 +66,19 @@ void ESP32Server::handleBlindsTimerPost() {
     const char* loweringTime = doc["loweringTime"];
     const char* raisingTime = doc["raisingTime"];
 
-    static struct payload taskPayload;
-    taskPayload.loweringTime = String(loweringTime);
-    taskPayload.raisingTime = String(raisingTime);
-
-    const char* loweringTimeStr = taskPayload.loweringTime.c_str();
-    const char* raisingTimeStr = taskPayload.raisingTime.c_str();
-
     pthread_mutex_lock(&timeValMutex);
-    NvmMemory::getInstance().writeToNvm("TIME", "L", loweringTimeStr);
-    NvmMemory::getInstance().writeToNvm("TIME", "R", raisingTimeStr);
+    NvmMemory::getInstance().writeToNvm("TIME", "L", loweringTime);
+    NvmMemory::getInstance().writeToNvm("TIME", "R", raisingTime);
     pthread_mutex_unlock(&timeValMutex);
+    
+    ESP32Server::GetInstance().driverManager->setDriverData(
+      D_SCHEDULER,
+      S_SCHEDULER_SET_NEMA_LOW_TIME,1,loweringTime);
+
+    ESP32Server::GetInstance().driverManager->setDriverData(
+      D_SCHEDULER,
+      S_SCHEDULER_SET_NEMA_UP_TIME,1,raisingTime);
+
   }
 }
 
@@ -87,6 +89,7 @@ void ESP32Server::setRandLTimers() {
     return;
   }
   pthread_mutex_lock(&timeValMutex);
+  //TODO tu mona by wywaluc chyba te zmienne ?
   GetInstance().loweringTimeVal = NvmMemory::getInstance().readFromNvm("TIME", "L");
   GetInstance().raisingTimeVal = NvmMemory::getInstance().readFromNvm("TIME", "R");
   pthread_mutex_unlock(&timeValMutex);
