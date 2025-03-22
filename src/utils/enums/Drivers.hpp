@@ -13,10 +13,14 @@ enum Drivers {
 enum DataSignals {
     // WIFI
     S_GET_WIFI_STATUS = 0,
-    S_SET_WIFI_LED_OFF,
+    
 
     //LED
     S_TRIGGER_RESET,
+    S_SET_WIFI_LED_OFF,
+    S_SET_LED_STATE_CONFIG_MODE,
+    S_SET_LED_STATE_BOOT_MODE,
+    S_SET_LED_STATE_ACTIVE_MODE,
 
     //NEMA17
     S_SET_NEMA_UP_STATUS,

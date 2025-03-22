@@ -9,7 +9,7 @@
 #define WIFI_CONNECTED     0
 #define WIFI_NOT_CONNECTED 1
 #define WIFI_CONFIG_MODE   2
-#define WIFI_RETRIES_MAX   4
+#define WIFI_RETRIES_MAX   8
 
 union WifiStats{
 	u8_t state;

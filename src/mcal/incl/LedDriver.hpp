@@ -5,6 +5,10 @@
 #include "Thread.hpp"
 #define WIFI_LED  21
 
+#define LED_SYSTEM_BOOT_STATE   0
+#define LED_SYSTEM_ACTIVE_STATE 1
+#define LED_SYSTEM_CONFIG_STATE 2
+
 class DriverManager;
 
 class LedDriver : public Driver, public Thread  {
@@ -23,6 +27,9 @@ class LedDriver : public Driver, public Thread  {
     private:
     ErrorCode init() override;
     ErrorCode deinit() override;
+    void blinkSystem(uint32_t time, bool isActive = false);
+
+    volatile uint8_t ledState;
 
 };
 

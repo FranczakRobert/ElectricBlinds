@@ -19,8 +19,8 @@ void *Scheduler::run(void *args)
 
       self->fetchHour();
       startCounting = true;
-      self->clock[MIN] = 59;
-      self->clock[HOUR] = 23;
+      // self->clock[MIN] = 59;
+      // self->clock[HOUR] = 23;
     }
     else{
       pthread_mutex_unlock(&self->mutex);
@@ -176,7 +176,7 @@ void Scheduler::fetchHour() {
         
     if (httpResponseCode>0) {
       String payload = http.getString();
-      Serial.println("[Scheduler] [fetchHour] - HAPPENING");
+      Serial.println("[Scheduler] [fetchHour] - DONE");
       JsonDocument doc;
       deserializeJson(doc, payload);
       

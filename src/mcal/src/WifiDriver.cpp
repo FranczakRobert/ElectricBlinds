@@ -95,6 +95,7 @@ ErrorCode WifiDriver::setData( DataSignals SIGNAL, uint16_t count, ...)
 void* WifiDriver::run(void* args) {
   WifiDriver* self = static_cast<WifiDriver*>(args);
   uint8_t counter = 1;
+  int8_t previousVal = -1;
   
   while (self->isRunning) {
     switch (WiFi.status())
@@ -106,6 +107,10 @@ void* WifiDriver::run(void* args) {
           WiFi._setStatus(WL_NO_SSID_AVAIL);
           counter = 0;
         }
+        if(previousVal != WL_DISCONNECTED) {
+          self->driverManager->setDriverData(D_LED,S_SET_LED_STATE_BOOT_MODE);
+          previousVal = WL_DISCONNECTED;
+        }
         break;
 
       case WL_CONNECTED:
@@ -115,16 +120,29 @@ void* WifiDriver::run(void* args) {
           self->driverManager->setDriverData(D_SCHEDULER,S_SCHEDULER_FETCH_DATA);
         }
         counter = 0;
+
+        if(previousVal != WL_CONNECTED) {
+          self->driverManager->setDriverData(D_LED,S_SET_LED_STATE_ACTIVE_MODE);
+          previousVal = WL_CONNECTED;
+        }
         break;
       
-      // case WL_CONNECTION_LOST:
-      //   self->wifiStats.state = WIFI_NOT_CONNECTED;
-      //   WiFi.reconnect();
-      //   break;
+      case WL_CONNECTION_LOST:
+        if(previousVal != WL_CONNECTION_LOST) {
+          self->driverManager->setDriverData(D_LED,S_SET_LED_STATE_BOOT_MODE);
+          WiFi.reconnect();
+          previousVal = WL_CONNECTION_LOST;
+        }
+        break;
       
       case WL_NO_SSID_AVAIL:
         self->wifiStats.state = WIFI_CONFIG_MODE;
+        if(previousVal != WL_NO_SSID_AVAIL) {
+          self->driverManager->setDriverData(D_LED,S_SET_LED_STATE_CONFIG_MODE);
+          previousVal = WL_NO_SSID_AVAIL;
+        }
         self->getBlindsDataByAP();
+        
         break;
       
       default:
@@ -137,7 +155,7 @@ void* WifiDriver::run(void* args) {
 }
 
 ErrorCode WifiDriver::start() {
-  return startThread(TAG,this,run);
+  return startThread(TAG,this,run,true); // TODO stak sie wyjebal
 }
 
 WiFiServer server(80);
@@ -205,14 +223,14 @@ void WifiDriver::getBlindsDataByAP() {
 
             NvmMemory::getInstance().writeToNvm("CREDENTIALS","SSID",ssid);
             NvmMemory::getInstance().writeToNvm("CREDENTIALS","PSSWD",psswd);
-            // driverManager->notifyScheduler();
-            Serial.println("[WifiDriver] [INFO] [getBlindsDataByAP]");
             driverManager->setDriverData(D_SCHEDULER,S_SCHEDULER_FETCH_DATA);
+            driverManager->setDriverData(D_LED,S_SET_LED_STATE_ACTIVE_MODE);
             break;
           }
 
           if(WiFi.status() != WL_CONNECTED) {
             Serial.println("[Wifi][GetBlindsDataByAP] - contecting....");
+            driverManager->setDriverData(D_LED,S_SET_LED_STATE_BOOT_MODE);
               counter++;
               if(counter >= WIFI_RETRIES_MAX) {
                 doIHaveData = false;
