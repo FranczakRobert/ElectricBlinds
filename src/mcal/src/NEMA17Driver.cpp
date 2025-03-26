@@ -17,7 +17,7 @@ NEMA17Driver::~NEMA17Driver() {
 }
 
 ErrorCode NEMA17Driver::init() {
-    myStepper.setSpeed(30);
+    myStepper.setSpeed(60);
     motor_state = {RELEASE,ARROW_UP};
 
     position_MAX = 300;
@@ -64,7 +64,7 @@ void *NEMA17Driver::run(void *args)
         else {
             self->motorLow();
         }
- 
+
         vTaskDelay(10 / portTICK_PERIOD_MS);
     }
     return nullptr;
@@ -76,8 +76,40 @@ void NEMA17Driver::saveMotorStatus() {
     NvmMemory::getInstance().writeToNvm("ESP32","MOTOR_POSITION",pchar);
 
     String motor_position_nvm = NvmMemory::getInstance().readFromNvm("ESP32","MOTOR_POSITION");
-    Serial.print("Motor position: ");
-    Serial.println(motor_position_nvm);
+    // Serial.print("Motor position: ");
+    // Serial.println(motor_position_nvm);
+}
+
+ErrorCode NEMA17Driver::motorMAXHigh()
+{
+    pthread_mutex_lock(&mutex);
+    motor_state.direction = 1;
+    int i = position;
+    for(i; i < position_MAX; i += stepper) {
+        motorHigh();
+    }
+    pthread_mutex_unlock(&mutex);
+    Serial.print("POSITION");
+    Serial.println(position);
+    NvmMemory::getInstance().writeToNvm("ESP32","MOTOR_POSITION",(const char*)&position);
+    return ErrorCode();
+}
+
+ErrorCode NEMA17Driver::motorMAXLow() // TODO Zrob testy pod obroty co pare sekund.
+{
+    pthread_mutex_lock(&mutex);
+    motor_state.direction = 0;
+    int i = position;
+    for(i; i > position_MIN; i -= stepper) {
+        motorHigh();
+    }
+    pthread_mutex_unlock(&mutex);
+
+    Serial.print("POSITION");
+    Serial.println(position);
+
+    NvmMemory::getInstance().writeToNvm("ESP32","MOTOR_POSITION",(const char*)&position);
+    return ErrorCode();
 }
 
 ErrorCode NEMA17Driver::motorLow()  {
@@ -122,11 +154,11 @@ ErrorCode NEMA17Driver::motorMAXLow()
 }
 
 ErrorCode NEMA17Driver::motorHigh() {
-    uint16_t stepper = 10;
 
     if(1 == motor_state.direction) {
         if(position < position_MIN) {
             position = position_MIN;
+            motorLow();
             return ErrorCode();
         }
         if(position < position_MAX) {
@@ -137,6 +169,7 @@ ErrorCode NEMA17Driver::motorHigh() {
     }else if(0 == motor_state.direction) {
         if(position > position_MAX) {
             position = position_MAX;
+            motorLow();
 
             return ErrorCode();
         }
@@ -146,10 +179,6 @@ ErrorCode NEMA17Driver::motorHigh() {
         }
     }
 
-    digitalWrite(IN1, HIGH);
-    digitalWrite(IN2, LOW); 
-    digitalWrite(IN3, HIGH);
-    digitalWrite(IN4, LOW);
     return E_OK;
 }
 
@@ -162,7 +191,7 @@ DataSignalsResponse NEMA17Driver::getData(DataSignals SIGNAL)
     return DataSignalsResponse();
 }
 
-ErrorCode NEMA17Driver::setData( DataSignals SIGNAL, uint16_t count, ...)
+ErrorCode NEMA17Driver::setData( DataSignals SIGNAL, uint16_t count, ...)  // TODO zabezpieczyc sygnały zeby sie nie pokrywaly
 {
     switch (SIGNAL)
     {
@@ -183,6 +212,7 @@ ErrorCode NEMA17Driver::setData( DataSignals SIGNAL, uint16_t count, ...)
     case S_SET_NEMA_RELEASE_STATUS:
         pthread_mutex_lock(&mutex);
         motor_state.status = RELEASE;
+        motorLow();
         saveMotorStatus();
         pthread_mutex_unlock(&mutex);
         break;

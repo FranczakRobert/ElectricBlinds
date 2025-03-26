@@ -155,7 +155,7 @@ void* WifiDriver::run(void* args) {
 }
 
 ErrorCode WifiDriver::start() {
-  return startThread(TAG,this,run,true); // TODO stak sie wyjebal
+  return startThread(TAG,this,run,true);
 }
 
 WiFiServer server(80);

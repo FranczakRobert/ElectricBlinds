@@ -41,6 +41,7 @@ private:
     const uint8_t IN2 = 27;
     const uint8_t IN3 = 26;
     const uint8_t IN4 = 25;
+    const uint16_t stepper = 10;
 
     uint32_t position_MAX;
     uint32_t position_MIN;
