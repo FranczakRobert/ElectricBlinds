@@ -36,8 +36,6 @@ ErrorCode WifiDriver::init() {
   String ssid = NvmMemory::getInstance().readFromNvm("CREDENTIALS","SSID");
   String psswd = NvmMemory::getInstance().readFromNvm("CREDENTIALS","PSSWD");
 
-  Serial.println(ssid);
-  Serial.println(psswd);
   vTaskDelay(1000);
 
   if(TRIGGER_WIFI_SEARCH) {
@@ -114,7 +112,9 @@ void* WifiDriver::run(void* args) {
         break;
 
       case WL_CONNECTED:
-        Serial.println(WiFi.localIP());
+        if(WIFI_IP_SHOW) {
+          Serial.println(WiFi.localIP());  
+        }
         self->wifiStats.state = WIFI_CONNECTED;
         if(counter != 0) {
           self->driverManager->setDriverData(D_SCHEDULER,S_SCHEDULER_FETCH_DATA);
@@ -212,7 +212,10 @@ void WifiDriver::getBlindsDataByAP() {
         while (doIHaveData) {
 
           if (WiFi.status() == WL_CONNECTED){
-            Serial.println(WiFi.localIP());
+            if(WIFI_IP_SHOW) {
+              Serial.println(WiFi.localIP());  
+            }
+            
             wifiStats.state = WIFI_CONNECTED;
             client.flush();
             client.stop();

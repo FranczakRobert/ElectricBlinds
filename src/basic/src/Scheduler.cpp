@@ -3,6 +3,7 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include "NvmMemory.hpp"
+#include "config.hpp"
 
 void *Scheduler::run(void *args)
 {
@@ -16,18 +17,15 @@ void *Scheduler::run(void *args)
     if(self->fetchData) {
       self->fetchData = false;
       pthread_mutex_unlock(&self->mutex);
-
       self->fetchHour();
       startCounting = true;
-      // self->clock[MIN] = 59;
-      // self->clock[HOUR] = 23;
     }
     else{
       pthread_mutex_unlock(&self->mutex);
     }
 
     if(startCounting) {
-      seconds = (seconds + 5) % 60;
+      seconds = (seconds + 1) % 60;
       if(0 == seconds) {
         self->clock[MIN] = (self->clock[MIN] + 1) % 60;
         stopper = false;
@@ -35,29 +33,33 @@ void *Scheduler::run(void *args)
           self->clock[HOUR] = (self->clock[HOUR] + 1) % 24;
         }
       }
-      vTaskDelay(3000);
-
       pthread_mutex_lock(&self->mutex);
 
       if(!stopper) {
         if(self->NEMAWorkingTime[NEMA_RAISING][HOUR] == self->clock[HOUR] &&
           self->NEMAWorkingTime[NEMA_RAISING][MIN] == self->clock[MIN]) {
             self->driverManager->setDriverData(D_NEMA17,S_TRIGGER_NEM_RAISING);
+            stopper = true;
         }
   
         if(self->NEMAWorkingTime[NEMA_LOWERING][HOUR] == self->clock[HOUR] &&
           self->NEMAWorkingTime[NEMA_LOWERING][MIN] == self->clock[MIN]) {
             self->driverManager->setDriverData(D_NEMA17,S_TRIGGER_NEMA_LOWERING);
+            stopper = true;
         }
-        stopper = true;
+        
       }
 
-      
-
       pthread_mutex_unlock(&self->mutex);
+      if(CLOCK_SHOW) {
+        Serial.print(self->clock[HOUR]);
+        Serial.print(" : ");
+        Serial.println(self->clock[MIN]);
+      }
+      
     }
 
-    vTaskDelay(200);
+    vTaskDelay(1000); // pilnuj tu dodawnia sekund
   }
   
   return nullptr;
