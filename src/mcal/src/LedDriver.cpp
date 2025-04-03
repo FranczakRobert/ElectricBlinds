@@ -51,7 +51,6 @@ ErrorCode LedDriver::setData(DataSignals SIGNAL, uint16_t count, ...)
         break;
 
     case S_SET_LED_STATE_BOOT_MODE:
-    // Serial.println("HALOOOO");
         pthread_mutex_lock(&mutex);
         ledState = LED_SYSTEM_BOOT_STATE;
         pthread_mutex_unlock(&mutex);
@@ -71,7 +70,6 @@ ErrorCode LedDriver::setData(DataSignals SIGNAL, uint16_t count, ...)
 }
 
 
-// TODO Zrobić aby led mrugał dopiero po fetchu godziny
 void *LedDriver::run(void *args) {
     LedDriver* self = static_cast<LedDriver*>(args);
     int8_t previousVal = -1;
@@ -85,16 +83,18 @@ void *LedDriver::run(void *args) {
         switch (led) {
             case LED_SYSTEM_BOOT_STATE:
                 self->blinkSystem(500);
+                previousVal = LED_SYSTEM_BOOT_STATE;
             break;
 
             case LED_SYSTEM_CONFIG_STATE:
                 self->blinkSystem(100);
+                previousVal = LED_SYSTEM_CONFIG_STATE;
             break;
 
             case LED_SYSTEM_ACTIVE_STATE:
-            if(previousVal != LED_SYSTEM_BOOT_STATE) {
+            if(previousVal != LED_SYSTEM_ACTIVE_STATE) {
                 self->blinkSystem(0,true);
-                previousVal = LED_SYSTEM_BOOT_STATE;
+                previousVal = LED_SYSTEM_ACTIVE_STATE;
             }
             break;
             

@@ -17,7 +17,16 @@ void *Scheduler::run(void *args)
     if(self->fetchData) {
       self->fetchData = false;
       pthread_mutex_unlock(&self->mutex);
-      self->fetchHour();
+
+      if(self->fetchHour())
+      {
+        self->fetchData = true;
+        Serial.println("[Scheduler] [run] - request API");
+        vTaskDelay(2000);
+        continue;
+      }
+        
+      
       startCounting = true;
     }
     else{
@@ -167,8 +176,7 @@ ErrorCode Scheduler::setData(DataSignals SIGNAL, uint16_t count, ...)
     return ErrorCode();
 }
 
-// TODO Ustabilizować
-void Scheduler::fetchHour() {
+ErrorCode Scheduler::fetchHour() {
   Serial.println("Scheduler fetching data...");
 
     HTTPClient http;
@@ -185,12 +193,17 @@ void Scheduler::fetchHour() {
       pthread_mutex_lock(&mutex);
       clock[HOUR] = doc["hour"];
       clock[MIN] = doc["minute"];
-      pthread_mutex_unlock(&mutex);      
+      pthread_mutex_unlock(&mutex);
+      
     }
     else {
       Serial.print("Error code: ");
       Serial.println(httpResponseCode);
+      driverManager->setDriverData(D_LED,S_SET_LED_STATE_BOOT_MODE);
+      return E_NOT_OK;
     }
     
     http.end();
+    driverManager->setDriverData(D_LED,S_SET_LED_STATE_ACTIVE_MODE);
+    return E_OK;
   }

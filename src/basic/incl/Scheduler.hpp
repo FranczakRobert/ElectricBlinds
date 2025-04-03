@@ -42,7 +42,7 @@ class Scheduler : public Driver ,public Thread {
 
   DriverManager* driverManager;
 
-  void fetchHour();
+  ErrorCode fetchHour();
   void setTimeClock(volatile uint32_t* result, String time);
 };
 
