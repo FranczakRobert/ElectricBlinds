@@ -49,9 +49,6 @@ private:
     ErrorCode motorHigh();
     ErrorCode motorLow();
 
-    ErrorCode motorMAXHigh();
-    ErrorCode motorMAXLow();
-
     MotorStatus motor_state;
 
     Stepper myStepper;

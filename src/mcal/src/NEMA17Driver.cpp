@@ -17,7 +17,7 @@ NEMA17Driver::~NEMA17Driver() {
 }
 
 ErrorCode NEMA17Driver::init() {
-    myStepper.setSpeed(60);
+    myStepper.setSpeed(30);
     motor_state = {RELEASE,ARROW_UP};
 
     position_MAX = 300;
@@ -55,7 +55,6 @@ ErrorCode NEMA17Driver::start() {
 void *NEMA17Driver::run(void *args)
 {
     NEMA17Driver* self = static_cast<NEMA17Driver*>(args);
-    int8_t prev_motor_state = -1;
 
     while (self->isRunning) {
         if(self->motor_state.status) {
@@ -63,9 +62,8 @@ void *NEMA17Driver::run(void *args)
         }
         else {
             self->motorLow();
+            // Serial.println("LOWLOW");
         }
-
-        vTaskDelay(10 / portTICK_PERIOD_MS);
     }
     return nullptr;
 }
@@ -75,41 +73,8 @@ void NEMA17Driver::saveMotorStatus() {
     char const *pchar = s.c_str();
     NvmMemory::getInstance().writeToNvm("ESP32","MOTOR_POSITION",pchar);
 
-    String motor_position_nvm = NvmMemory::getInstance().readFromNvm("ESP32","MOTOR_POSITION");
-    // Serial.print("Motor position: ");
+    // String motor_position_nvm = NvmMemory::getInstance().readFromNvm("ESP32","MOTOR_POSITION");
     // Serial.println(motor_position_nvm);
-}
-
-ErrorCode NEMA17Driver::motorMAXHigh()
-{
-    pthread_mutex_lock(&mutex);
-    motor_state.direction = 1;
-    int i = position;
-    for(i; i < position_MAX; i += stepper) {
-        motorHigh();
-    }
-    pthread_mutex_unlock(&mutex);
-    Serial.print("POSITION");
-    Serial.println(position);
-    NvmMemory::getInstance().writeToNvm("ESP32","MOTOR_POSITION",(const char*)&position);
-    return ErrorCode();
-}
-
-ErrorCode NEMA17Driver::motorMAXLow() // TODO Zrob testy pod obroty co pare sekund.
-{
-    pthread_mutex_lock(&mutex);
-    motor_state.direction = 0;
-    int i = position;
-    for(i; i > position_MIN; i -= stepper) {
-        motorHigh();
-    }
-    pthread_mutex_unlock(&mutex);
-
-    Serial.print("POSITION");
-    Serial.println(position);
-
-    NvmMemory::getInstance().writeToNvm("ESP32","MOTOR_POSITION",(const char*)&position);
-    return ErrorCode();
 }
 
 ErrorCode NEMA17Driver::motorLow()  {
@@ -126,29 +91,31 @@ ErrorCode NEMA17Driver::motorLow()  {
 ErrorCode NEMA17Driver::motorHigh() {
 
     if(1 == motor_state.direction) {
-        if(position < position_MIN) {
-            position = position_MIN;
-            motorLow();
-            return ErrorCode();
-        }
         if(position < position_MAX) {
             myStepper.step(stepper);
             position += stepper;
+        }else {
+            Serial.println("EEEEEE");
+            position = position_MAX;
+            motor_state.status = RELEASE;
+            saveMotorStatus();
+            motorLow();
         }
         
     }else if(0 == motor_state.direction) {
-        if(position > position_MAX) {
-            position = position_MAX;
-            motorLow();
-
-            return ErrorCode();
-        }
         if(position > position_MIN) {
             myStepper.step(-stepper);
             position -= stepper;
         }
+        else {
+            Serial.println("AAAAAAA");
+            position = position_MIN;
+            motor_state.status = RELEASE;
+            saveMotorStatus();
+            motorLow();
+        }
     }
-
+    vTaskDelay(10 / portTICK_PERIOD_MS);
     return E_OK;
 }
 
@@ -206,14 +173,18 @@ ErrorCode NEMA17Driver::setData( DataSignals SIGNAL, uint16_t count, ...)  // TO
 
     case S_TRIGGER_NEMA_LOWERING:
         Serial.println("NEMA - S_TRIGGER_NEMA_LOWERING");
-        motorMAXLow();
-        motorLow();
+        pthread_mutex_lock(&mutex);
+        motor_state.direction = ARROW_DOWN;
+        motor_state.status = HOLD;
+        pthread_mutex_unlock(&mutex);
         break;
 
     case S_TRIGGER_NEM_RAISING:
         Serial.println("NEMA - S_TRIGGER_NEM_RAISING");
-        motorMAXHigh();
-        motorLow();
+        pthread_mutex_lock(&mutex);
+        motor_state.direction = ARROW_UP;
+        motor_state.status = HOLD;
+        pthread_mutex_unlock(&mutex);
         break;
     
     default:
