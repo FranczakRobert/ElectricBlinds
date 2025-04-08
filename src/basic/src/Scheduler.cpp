@@ -177,7 +177,6 @@ ErrorCode Scheduler::setData(DataSignals SIGNAL, uint16_t count, ...)
 }
 
 ErrorCode Scheduler::fetchHour() {
-  Serial.println("Scheduler fetching data...");
 
     HTTPClient http;
     String queryString = "https://www.timeapi.io/api/time/current/zone?timeZone=Europe\%2FWarsaw";
@@ -186,7 +185,6 @@ ErrorCode Scheduler::fetchHour() {
         
     if (httpResponseCode>0) {
       String payload = http.getString();
-      Serial.println("[Scheduler] [fetchHour] - DONE");
       JsonDocument doc;
       deserializeJson(doc, payload);
       
