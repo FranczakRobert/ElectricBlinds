@@ -133,13 +133,18 @@ const String mainPage = R"rawliteral(
       <button id="setButton">SET</button>
 
       <button id="resetButton">RESET</button>
+
+      <button id="MAX">Full Max</button>
+      <button id="MIN">Full Min</button>
   
       <script>
   let upButton = document.getElementById('upButton');
   let downButton = document.getElementById('downButton');
   let setButton = document.getElementById('setButton');
   let setResetButton = document.getElementById('resetButton');
-  
+  let minButton = document.getElementById('MIN');
+  let maxButton = document.getElementById('MAX');
+
   // Zmienna do przechowywania pobranych danych
   let timeData = null;
   
@@ -245,6 +250,28 @@ const String mainPage = R"rawliteral(
 
   setResetButton.addEventListener('click', function() {
         fetch('/reset', {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+      })
+      .then(response => response.text())
+      .catch(error => console.error('Error:', error));
+  });
+
+   maxButton.addEventListener('click', function() {
+        fetch('/max', {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+      })
+      .then(response => response.text())
+      .catch(error => console.error('Error:', error));
+  });
+
+  minButton.addEventListener('click', function() {
+        fetch('/min', {
           method: 'GET',
           headers: {
               'Content-Type': 'application/json'

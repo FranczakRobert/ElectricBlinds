@@ -20,6 +20,8 @@ class ESP32Server : public Driver , public Thread {
     static void handleBlindsTimerPost();
     static void setRandLTimers();
     static void handleReset();
+    static void handleMax();
+    static void handleMin();
     static void* run(void* args);
 
     private:

@@ -111,12 +111,24 @@ void ESP32Server::handleReset()
   ESP32Server::GetInstance().driverManager->setDriverData(D_WIFI,S_TRIGGER_RESET);
 }
 
+void ESP32Server::handleMax()
+{
+  ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_TRIGGER_NEM_RAISING);
+}
+
+void ESP32Server::handleMin()
+{
+  ESP32Server::GetInstance().driverManager->setDriverData(D_NEMA17,S_TRIGGER_NEMA_LOWERING);
+}
+
 ErrorCode ESP32Server::init() {
   ESP32Server::server.on("/", HTTP_GET, handleRoot);
   ESP32Server::server.on("/timeUpdate", HTTP_GET, setRandLTimers);
   ESP32Server::server.on("/motorControll", HTTP_POST, handleMotorPost);
   ESP32Server::server.on("/blindsTime", HTTP_POST, handleBlindsTimerPost);
   ESP32Server::server.on("/reset", HTTP_GET, handleReset);
+  ESP32Server::server.on("/max", HTTP_GET, handleMax);
+  ESP32Server::server.on("/min", HTTP_GET, handleMin);
   ESP32Server::server.begin(8080);
   return E_OK;
 }
