@@ -92,7 +92,9 @@ void *LedDriver::run(void *args) {
             break;
 
             case LED_SYSTEM_ACTIVE_STATE:
+            
             if(previousVal != LED_SYSTEM_ACTIVE_STATE) {
+                vTaskDelay(10/portTICK_PERIOD_MS);
                 self->blinkSystem(0,true);
                 previousVal = LED_SYSTEM_ACTIVE_STATE;
             }
