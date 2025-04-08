@@ -45,18 +45,26 @@ void *Scheduler::run(void *args)
       pthread_mutex_lock(&self->mutex);
 
       if(!stopper) {
-        if(self->NEMAWorkingTime[NEMA_RAISING][HOUR] == self->clock[HOUR] &&
-          self->NEMAWorkingTime[NEMA_RAISING][MIN] == self->clock[MIN]) {
-            self->driverManager->setDriverData(D_NEMA17,S_TRIGGER_NEM_RAISING);
-            stopper = true;
+        bool hours = self->NEMAWorkingTime[NEMA_RAISING][HOUR] == self->NEMAWorkingTime[NEMA_LOWERING][HOUR];
+        bool minutes = self->NEMAWorkingTime[NEMA_RAISING][MIN] == self->NEMAWorkingTime[NEMA_LOWERING][MIN];
+
+        if((hours & minutes) == false)
+        {
+            if(self->NEMAWorkingTime[NEMA_RAISING][HOUR] == self->clock[HOUR] &&
+              self->NEMAWorkingTime[NEMA_RAISING][MIN] == self->clock[MIN]) {
+                self->driverManager->setDriverData(D_NEMA17,S_TRIGGER_NEM_RAISING);
+                stopper = true;
+            }
+      
+            if(self->NEMAWorkingTime[NEMA_LOWERING][HOUR] == self->clock[HOUR] &&
+              self->NEMAWorkingTime[NEMA_LOWERING][MIN] == self->clock[MIN]) {
+                self->driverManager->setDriverData(D_NEMA17,S_TRIGGER_NEMA_LOWERING);
+                stopper = true;
+            }
         }
-  
-        if(self->NEMAWorkingTime[NEMA_LOWERING][HOUR] == self->clock[HOUR] &&
-          self->NEMAWorkingTime[NEMA_LOWERING][MIN] == self->clock[MIN]) {
-            self->driverManager->setDriverData(D_NEMA17,S_TRIGGER_NEMA_LOWERING);
-            stopper = true;
+        else {
+          Serial.println("STOPPED");
         }
-        
       }
 
       pthread_mutex_unlock(&self->mutex);

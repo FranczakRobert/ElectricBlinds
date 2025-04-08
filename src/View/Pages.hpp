@@ -114,20 +114,20 @@ const String mainPage = R"rawliteral(
     </head>
     <body>
   
-      <h1>ESP32 Arrow Key Control</h1>
+      <h1>Panel Sterowania</h1>
   
       <button id="upButton" class="button">UP</button>
       <button id="downButton" class="button">DOWN</button>
   
       <div class="input-group">
-          <label for="loweringTime">Lowering the blinds</label>
+          <label for="loweringTime">Opuszczanie</label>
           <input type="time" id="loweringTime">
       </div>
       <div class="input-group">
-          <label for="raisingTime">Raising the blinds</label>
+          <label for="raisingTime">Podnoszenie</label>
           <input type="time" id="raisingTime" >
       </div>
-
+      <label>Ustaw taki sam czas jezeli chcesz wylaczyc automatyzacje.</label>
       <div id="maxValue">Max: Loading...</div>  
 
       <button id="setButton">SET</button>
