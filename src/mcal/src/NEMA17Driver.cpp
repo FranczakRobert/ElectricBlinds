@@ -62,7 +62,6 @@ void *NEMA17Driver::run(void *args)
         }
         else {
             self->motorLow();
-            // Serial.println("LOWLOW");
         }
     }
     return nullptr;
@@ -72,9 +71,6 @@ void NEMA17Driver::saveMotorStatus() {
     std::string s = std::to_string(position);
     char const *pchar = s.c_str();
     NvmMemory::getInstance().writeToNvm("ESP32","MOTOR_POSITION",pchar);
-    // vTaskDelay(100); // Dobra nie wiem czemu z tym dziala
-    // String motor_position_nvm = NvmMemory::getInstance().readFromNvm("ESP32","MOTOR_POSITION");
-    // Serial.println(motor_position_nvm);
 }
 
 ErrorCode NEMA17Driver::motorLow()  {

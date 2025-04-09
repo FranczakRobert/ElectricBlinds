@@ -89,14 +89,13 @@ void ESP32Server::setRandLTimers() {
     return;
   }
   pthread_mutex_lock(&timeValMutex);
-  //TODO tu mona by wywaluc chyba te zmienne ?
-  GetInstance().loweringTimeVal = NvmMemory::getInstance().readFromNvm("TIME", "L");
-  GetInstance().raisingTimeVal = NvmMemory::getInstance().readFromNvm("TIME", "R");
+  String loweringTimeVal = NvmMemory::getInstance().readFromNvm("TIME", "L");
+  String raisingTimeVal = NvmMemory::getInstance().readFromNvm("TIME", "R");
   pthread_mutex_unlock(&timeValMutex);
   
     JsonDocument doc;
-    doc["loweringTime"] = ESP32Server::GetInstance().loweringTimeVal.isEmpty() ? "00:00" : ESP32Server::GetInstance().loweringTimeVal;
-    doc["raisingTime"] = ESP32Server::GetInstance().raisingTimeVal.isEmpty() ? "00:00" : ESP32Server::GetInstance().raisingTimeVal;
+    doc["loweringTime"] = loweringTimeVal.isEmpty() ? "00:00" : loweringTimeVal;
+    doc["raisingTime"] = raisingTimeVal.isEmpty() ? "00:00" : raisingTimeVal;
     doc["max"] = ESP32Server::GetInstance().max.isEmpty() ? "300" : ESP32Server::GetInstance().max;
 
     String response;
