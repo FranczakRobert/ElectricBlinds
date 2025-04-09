@@ -63,7 +63,7 @@ void *Scheduler::run(void *args)
             }
         }
         else {
-          Serial.println("STOPPED");
+          // Serial.println("STOPPED");
         }
       }
 

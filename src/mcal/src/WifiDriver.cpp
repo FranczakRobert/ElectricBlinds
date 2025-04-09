@@ -79,7 +79,9 @@ ErrorCode WifiDriver::setData( DataSignals SIGNAL, uint16_t count, ...)
   {
   case S_TRIGGER_RESET:
       Serial.println("[Wifi] [setData] - RESETING");
+      pthread_mutex_lock(&mutex);
       wifiStats.state = WIFI_CONFIG_MODE;
+      pthread_mutex_unlock(&mutex);
       WiFi.disconnect();
     break;
   
@@ -117,12 +119,12 @@ void* WifiDriver::run(void* args) {
         }
         self->wifiStats.state = WIFI_CONNECTED;
         if(counter != 0) {
-          self->driverManager->setDriverData(D_SCHEDULER,S_SCHEDULER_FETCH_DATA);
+          counter = 0;
         }
-        counter = 0;
-
+        
         if(previousVal != WL_CONNECTED) {
-          self->driverManager->setDriverData(D_LED,S_SET_LED_STATE_ACTIVE_MODE);
+          self->driverManager->setDriverData(D_LED,S_SET_LED_STATE_ACTIVE_MODE); // Moze to do Schedulera jak juz zlapie godzine?
+          self->driverManager->setDriverData(D_SCHEDULER,S_SCHEDULER_FETCH_DATA);
           previousVal = WL_CONNECTED;
         }
         break;
@@ -226,7 +228,6 @@ void WifiDriver::getBlindsDataByAP() {
 
             NvmMemory::getInstance().writeToNvm("CREDENTIALS","SSID",ssid);
             NvmMemory::getInstance().writeToNvm("CREDENTIALS","PSSWD",psswd);
-            driverManager->setDriverData(D_SCHEDULER,S_SCHEDULER_FETCH_DATA);
             driverManager->setDriverData(D_LED,S_SET_LED_STATE_ACTIVE_MODE);
             break;
           }
