@@ -96,8 +96,10 @@ void* WifiDriver::run(void* args) {
   WifiDriver* self = static_cast<WifiDriver*>(args);
   uint8_t counter = 1;
   int8_t previousVal = -1;
+  bool wasEverConnected = false;
   
   while (self->isRunning) {
+    delay(2000);
     switch (WiFi.status())
     {
       case WL_DISCONNECTED:
@@ -114,6 +116,7 @@ void* WifiDriver::run(void* args) {
         break;
 
       case WL_CONNECTED:
+        
         if(WIFI_IP_SHOW) {
           Serial.println(WiFi.localIP());  
         }
@@ -123,10 +126,13 @@ void* WifiDriver::run(void* args) {
         }
         
         if(previousVal != WL_CONNECTED) {
-          self->driverManager->setDriverData(D_LED,S_SET_LED_STATE_ACTIVE_MODE); // Moze to do Schedulera jak juz zlapie godzine?
-          self->driverManager->setDriverData(D_SCHEDULER,S_SCHEDULER_FETCH_DATA);
+          self->driverManager->setDriverData(D_LED,S_SET_LED_STATE_ACTIVE_MODE);
+          if(!wasEverConnected) {
+            self->driverManager->setDriverData(D_SCHEDULER,S_SCHEDULER_FETCH_DATA);
+          }
           previousVal = WL_CONNECTED;
         }
+        wasEverConnected = true;
         break;
       
       case WL_CONNECTION_LOST:
@@ -150,7 +156,7 @@ void* WifiDriver::run(void* args) {
       default:
         break;
     }
-    delay(2000);
+   
   }
   WiFi.disconnect();
   return nullptr;
