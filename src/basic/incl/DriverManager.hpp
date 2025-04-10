@@ -17,9 +17,7 @@ class DriverManager {
     ErrorCode stopAllDrivers();
     ErrorCode initAllDrivers();
     ErrorCode deinitAllDrivers();
-    ErrorCode notifyScheduler();
 
-    DataSignalsResponse getDriverData(Drivers driver, DataSignals signal);
     ErrorCode setDriverData(Drivers driver, DataSignals signal);
     ErrorCode setDriverData(Drivers driver, DataSignals signal ,u16_t count,  ...);
 

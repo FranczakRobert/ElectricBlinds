@@ -21,10 +21,6 @@ class DriverManager;
 
 class NEMA17Driver : public Driver, public Thread {
 
-    static void* run(void* args);
-
-    void saveMotorStatus();
-
 public:
     NEMA17Driver(DriverManager* driverManager);
     ~NEMA17Driver();
@@ -36,24 +32,23 @@ public:
 
 private:
     static int position;
-
     const uint8_t IN1 = 14;
     const uint8_t IN2 = 27;
     const uint8_t IN3 = 26;
     const uint8_t IN4 = 25;
     const uint16_t stepper = 10;
-
     uint32_t position_MAX;
     uint32_t position_MIN;
 
+    static void* run(void* args);
     ErrorCode motorHigh();
     ErrorCode motorLow();
-
-    MotorStatus motor_state;
-
-    Stepper myStepper;
+    ErrorCode saveMotorStatus();
     ErrorCode init() override;
     ErrorCode deinit() override;
+
+    Stepper myStepper;
+    MotorStatus motor_state;
 
 };
 

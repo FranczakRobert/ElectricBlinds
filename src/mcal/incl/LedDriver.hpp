@@ -29,7 +29,7 @@ class LedDriver : public Driver, public Thread  {
     ErrorCode deinit() override;
     void blinkSystem(uint32_t time, bool isActive = false);
 
-    volatile uint8_t ledState;
+    uint8_t ledState;
 
 };
 

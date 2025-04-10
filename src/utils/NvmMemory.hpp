@@ -5,7 +5,6 @@
 #include <Preferences.h>
 class NvmMemory
 {
-    
 private:
     NvmMemory(){/*Empty*/};
     NvmMemory(const NvmMemory&) = delete;
@@ -32,7 +31,7 @@ public:
             Serial.println("[NVM][readFromNvm] - readed value is empty");
         }
         pref.end();
-
+        
         return value;
     }
 };

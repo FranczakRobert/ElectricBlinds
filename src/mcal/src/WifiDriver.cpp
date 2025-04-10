@@ -67,7 +67,6 @@ ErrorCode WifiDriver::stop() {
   return E_NOT_OK;
 }
 
-
 DataSignalsResponse WifiDriver::getData(DataSignals SIGNAL)
 {
   return (DataSignalsResponse)wifiStats.state;
@@ -169,7 +168,7 @@ ErrorCode WifiDriver::start() {
 WiFiServer server(80);
 DNSServer dnsServer;
 
-void WifiDriver::getBlindsDataByAP() {
+ErrorCode WifiDriver::getBlindsDataByAP() {
   bool doIHaveData = false;
   
   WiFi.softAP("Home-Rolety", NULL);
@@ -261,4 +260,5 @@ void WifiDriver::getBlindsDataByAP() {
     }
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
+  return E_OK;
 }

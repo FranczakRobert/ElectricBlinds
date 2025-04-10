@@ -14,7 +14,6 @@ enum DataSignals {
     // WIFI
     S_GET_WIFI_STATUS = 0,
     
-
     //LED
     S_TRIGGER_RESET,
     S_SET_WIFI_LED_OFF,

@@ -137,6 +137,12 @@ ErrorCode ESP32Server::deinit() {
   return E_OK;
 }
 
+ESP32Server &ESP32Server::GetInstance()
+{
+  static ESP32Server instance;
+  return instance;
+}
+
 ErrorCode ESP32Server::start(){
 
   if(E_OK == init()) {

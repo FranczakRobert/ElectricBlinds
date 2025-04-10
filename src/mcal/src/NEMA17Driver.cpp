@@ -67,20 +67,19 @@ void *NEMA17Driver::run(void *args)
     return nullptr;
 }
 
-void NEMA17Driver::saveMotorStatus() {
+ErrorCode NEMA17Driver::saveMotorStatus() {
     std::string s = std::to_string(position);
     char const *pchar = s.c_str();
     NvmMemory::getInstance().writeToNvm("ESP32","MOTOR_POSITION",pchar);
+    return E_OK;
 }
 
 ErrorCode NEMA17Driver::motorLow()  {
-
     digitalWrite(IN1, LOW);
     digitalWrite(IN2, LOW);
     digitalWrite(IN3, LOW);
     digitalWrite(IN4, LOW);
     vTaskDelay(10 / portTICK_PERIOD_MS);
-
     return E_OK;
 }
 
@@ -91,7 +90,6 @@ ErrorCode NEMA17Driver::motorHigh() {
             myStepper.step(stepper);
             position += stepper;
         }else {
-            Serial.println("EEEEEE");
             position = position_MAX;
             motor_state.status = RELEASE;
             saveMotorStatus();
@@ -104,7 +102,6 @@ ErrorCode NEMA17Driver::motorHigh() {
             position -= stepper;
         }
         else {
-            Serial.println("AAAAAAA");
             position = position_MIN;
             motor_state.status = RELEASE;
             saveMotorStatus();
@@ -124,23 +121,23 @@ DataSignalsResponse NEMA17Driver::getData(DataSignals SIGNAL)
     return DataSignalsResponse();
 }
 
-ErrorCode NEMA17Driver::setData( DataSignals SIGNAL, uint16_t count, ...)  // TODO zabezpieczyc sygnały zeby sie nie pokrywaly
+ErrorCode NEMA17Driver::setData( DataSignals SIGNAL, uint16_t count, ...)
 {
     switch (SIGNAL)
     {
     case S_SET_NEMA_UP_STATUS:
         motor_state.direction = ARROW_UP;
-        break;
+    break;
 
     case S_SET_NEMA_DOWN_STATUS:
         motor_state.direction = ARROW_DOWN;
-        break;
+    break;
 
     case S_SET_NEMA_HOLD_STATUS:
         pthread_mutex_lock(&mutex);
         motor_state.status = HOLD;
         pthread_mutex_unlock(&mutex);
-        break;
+    break;
     
     case S_SET_NEMA_RELEASE_STATUS:
         pthread_mutex_lock(&mutex);
@@ -148,7 +145,7 @@ ErrorCode NEMA17Driver::setData( DataSignals SIGNAL, uint16_t count, ...)  // TO
         motorLow();
         saveMotorStatus();
         pthread_mutex_unlock(&mutex);
-        break;
+    break;
 
     case S_SET_NEMA_MAX:
         if(count > 0) {
@@ -165,27 +162,25 @@ ErrorCode NEMA17Driver::setData( DataSignals SIGNAL, uint16_t count, ...)  // TO
             vTaskDelay(500 / portTICK_PERIOD_MS);
         }
         
-        break;
+    break;
 
     case S_TRIGGER_NEMA_LOWERING:
-        Serial.println("NEMA - S_TRIGGER_NEMA_LOWERING");
         pthread_mutex_lock(&mutex);
         motor_state.direction = ARROW_DOWN;
         motor_state.status = HOLD;
         pthread_mutex_unlock(&mutex);
-        break;
+    break;
 
     case S_TRIGGER_NEM_RAISING:
-        Serial.println("NEMA - S_TRIGGER_NEM_RAISING");
         pthread_mutex_lock(&mutex);
         motor_state.direction = ARROW_UP;
         motor_state.status = HOLD;
         pthread_mutex_unlock(&mutex);
-        break;
+    break;
     
     default:
         break;
     }
-    return ErrorCode();
+    return E_OK;
 }
 

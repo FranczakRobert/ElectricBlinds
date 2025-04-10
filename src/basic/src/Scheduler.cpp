@@ -25,8 +25,6 @@ void *Scheduler::run(void *args)
         vTaskDelay(2000);
         continue;
       }
-        
-      
       startCounting = true;
     }
     else{
@@ -34,7 +32,7 @@ void *Scheduler::run(void *args)
     }
 
     if(startCounting) {
-      seconds = (seconds + 1) % 60;
+      seconds = (seconds + SECOND_GP) % 60;
       if(0 == seconds) {
         self->clock[MIN] = (self->clock[MIN] + 1) % 60;
         stopper = false;
@@ -62,9 +60,6 @@ void *Scheduler::run(void *args)
                 stopper = true;
             }
         }
-        else {
-          // Serial.println("STOPPED");
-        }
       }
 
       pthread_mutex_unlock(&self->mutex);
@@ -76,7 +71,7 @@ void *Scheduler::run(void *args)
       
     }
 
-    vTaskDelay(1000); // pilnuj tu dodawnia sekund
+    vTaskDelay(SECOND_GP * 1000);
   }
   
   return nullptr;
@@ -92,11 +87,6 @@ Scheduler::~Scheduler()
 {
 }
 
-void Scheduler::setFetchData()
-{
-  
-}
-
 ErrorCode Scheduler::init()
 {
   fetchData = false;
@@ -106,32 +96,30 @@ ErrorCode Scheduler::init()
   setTimeClock(NEMAWorkingTime[NEMA_RAISING],raisingTime);
   setTimeClock(NEMAWorkingTime[NEMA_LOWERING],loweringTime);
   
-  return ErrorCode();
+  return E_OK;
 }
 
 ErrorCode Scheduler::deinit()
 {
-    return ErrorCode();
+  return ErrorCode();
 }
 
 ErrorCode Scheduler::start()
 {
-  startThread(TAG,this,run,true);
-  return ErrorCode();
+  return startThread(TAG,this,run,true);
 }
 
 ErrorCode Scheduler::stop()
 {
-  stopThread(TAG);
-  return ErrorCode();
+  return stopThread(TAG);
 }
 
 DataSignalsResponse Scheduler::getData(DataSignals)
 {
-    return DataSignalsResponse();
+  return DataSignalsResponse();
 }
 
-void Scheduler::setTimeClock(volatile uint32_t* result, String time) {
+void Scheduler::setTimeClock(uint32_t* result, String time) {
   String tmp ="";
   
   for (int i = 0; i < time.length(); i++)
@@ -151,65 +139,63 @@ ErrorCode Scheduler::setData(DataSignals SIGNAL, uint16_t count, ...)
 {
   switch (SIGNAL)
   {
-  case S_SCHEDULER_FETCH_DATA:
-    pthread_mutex_lock(&mutex);
-    fetchData = true;    
-    pthread_mutex_unlock(&mutex);
-    break;
-
-  case S_SCHEDULER_SET_NEMA_LOW_TIME:
-    if (count > 0) {
-      va_list args;
-      va_start(args, count);
+    case S_SCHEDULER_FETCH_DATA:
       pthread_mutex_lock(&mutex);
-      setTimeClock(NEMAWorkingTime[NEMA_LOWERING], String(va_arg(args, const char*)));
+      fetchData = true;    
       pthread_mutex_unlock(&mutex);
-      
     break;
 
-  case S_SCHEDULER_SET_NEMA_UP_TIME:
-    if (count > 0) {
-      va_list args;
-      va_start(args, count);
-      pthread_mutex_lock(&mutex);
-      setTimeClock(NEMAWorkingTime[NEMA_RAISING], String(va_arg(args, const char*)));
-      pthread_mutex_unlock(&mutex);
-    }
+    case S_SCHEDULER_SET_NEMA_LOW_TIME:
+      if (count > 0) {
+        va_list args;
+        va_start(args, count);
+        pthread_mutex_lock(&mutex);
+        setTimeClock(NEMAWorkingTime[NEMA_LOWERING], String(va_arg(args, const char*)));
+        pthread_mutex_unlock(&mutex);
+      }
     break;
 
-  default:
+    case S_SCHEDULER_SET_NEMA_UP_TIME:
+      if (count > 0) {
+        va_list args;
+        va_start(args, count);
+        pthread_mutex_lock(&mutex);
+        setTimeClock(NEMAWorkingTime[NEMA_RAISING], String(va_arg(args, const char*)));
+        pthread_mutex_unlock(&mutex);
+      }
     break;
-  }
-}
-    return ErrorCode();
-}
 
-ErrorCode Scheduler::fetchHour() {
-
-    HTTPClient http;
-    String queryString = "https://www.timeapi.io/api/time/current/zone?timeZone=Europe\%2FWarsaw";
-    http.begin(queryString.c_str());
-    int httpResponseCode = http.GET();
-        
-    if (httpResponseCode>0) {
-      String payload = http.getString();
-      JsonDocument doc;
-      deserializeJson(doc, payload);
-      
-      pthread_mutex_lock(&mutex);
-      clock[HOUR] = doc["hour"];
-      clock[MIN] = doc["minute"];
-      pthread_mutex_unlock(&mutex);
-      
-    }
-    else {
-      Serial.print("Error code: ");
-      Serial.println(httpResponseCode);
-      driverManager->setDriverData(D_LED,S_SET_LED_STATE_BOOT_MODE);
-      return E_NOT_OK;
-    }
+    default:
+      break;
     
-    http.end();
-    driverManager->setDriverData(D_LED,S_SET_LED_STATE_ACTIVE_MODE);
-    return E_OK;
+  }
+  return E_OK;
+}
+
+ErrorCode Scheduler::fetchHour() 
+{
+  HTTPClient http;
+  String queryString = "https://www.timeapi.io/api/time/current/zone?timeZone=Europe\%2FWarsaw";
+  http.begin(queryString.c_str());
+  int httpResponseCode = http.GET();
+      
+  if (httpResponseCode>0) {
+    String payload = http.getString();
+    JsonDocument doc;
+    deserializeJson(doc, payload);
+    
+    pthread_mutex_lock(&mutex);
+    clock[HOUR] = doc["hour"];
+    clock[MIN] = doc["minute"];
+    pthread_mutex_unlock(&mutex);
+    
+  }
+  else {
+    driverManager->setDriverData(D_LED,S_SET_LED_STATE_BOOT_MODE);
+    return E_NOT_OK;
+  }
+  
+  http.end();
+  driverManager->setDriverData(D_LED,S_SET_LED_STATE_ACTIVE_MODE);
+  return E_OK;
   }
