@@ -6,7 +6,6 @@
 #include "WifiDriver.hpp"
 #include "NEMA17Driver.hpp"
 #include "Scheduler.hpp"
-#include "MotorStatus.hpp"
 
 class DriverManager {
     public:
