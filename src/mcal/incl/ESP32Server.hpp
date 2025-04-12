@@ -9,12 +9,10 @@
 #include "Thread.hpp"
 
 class ESP32Server : public Driver , public Thread {
-    protected:
 
+protected:
     ESP32Server();
-    
     ~ESP32Server() {}
-
     static void handleRoot();
     static void handleMotorPost();
     static void handleBlindsTimerPost();
@@ -24,31 +22,28 @@ class ESP32Server : public Driver , public Thread {
     static void handleMin();
     static void* run(void* args);
 
-    private:
+private:
     DriverManager* driverManager;
     ErrorCode init() override;
     ErrorCode deinit() override;
 
-    public:
+public:
+    static ESP32Server& GetInstance();
+    ESP32Server(ESP32Server &other) = delete;
+    void operator=(const ESP32Server &) = delete;
+
+    ErrorCode setManager(DriverManager *drMg);
+
     static WebServer server;
     static String loweringTimeVal;
     static String raisingTimeVal;
     static String max;
     static pthread_mutex_t timeValMutex;
-    static ESP32Server& GetInstance() {
-        static ESP32Server instance;
-        return instance;
-    }
 
     ErrorCode start() override;
     ErrorCode stop() override;
     DataSignalsResponse getData(DataSignals SIGNAL) override;
     ErrorCode setData(DataSignals SIGNAL, uint16_t count, ...) override;
-    ErrorCode setManager(DriverManager *drMg);
-
-    ESP32Server(ESP32Server &other) = delete;
-    void operator=(const ESP32Server &) = delete;
-    
 };
 
 #endif // SERVER_HPP

@@ -44,15 +44,6 @@ ErrorCode DriverManager::deinitAllDrivers() {
     }
     return E_OK;
 }
-ErrorCode DriverManager::notifyScheduler()
-{
-    scheduler.setFetchData();   
-    return ErrorCode();
-}
-
-DataSignalsResponse DriverManager::getDriverData(Drivers driver,DataSignals signal) {
-    return drivers_array[driver]->getData(signal);
-}
 
 ErrorCode DriverManager::setDriverData(Drivers driver, DataSignals signal)
 {
@@ -112,7 +103,6 @@ ErrorCode DriverManager::stopAllDrivers() {
             return E_NOT_OK;
         }
     }
-    
     return E_OK;
 }
 
