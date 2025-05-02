@@ -3,6 +3,8 @@
 #include "NvmMemory.hpp"
 #include "ServerTests.hpp"
 #include <Preferences.h>
+#include "Display.hpp"
+
 class Preferences;
 
 ServerTests tests;
@@ -13,6 +15,7 @@ DriverManager driverManager;
 void setup() {
   
   Serial.begin(9600);
+  testDisplay();
   vTaskDelay(3000);
 
   if(!TEST) {

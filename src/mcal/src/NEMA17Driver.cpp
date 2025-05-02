@@ -7,7 +7,7 @@ class Preferences;
 int NEMA17Driver::position;
 
 NEMA17Driver::NEMA17Driver(DriverManager *driverManager)
-    : myStepper(200, IN1, IN2, IN3, IN4)
+    : myStepper(spr, Dire, Step)
 {
     this->driverManager = driverManager;
     TAG = "NEMA17";
@@ -17,7 +17,15 @@ NEMA17Driver::~NEMA17Driver() {
 }
 
 ErrorCode NEMA17Driver::init() {
-    myStepper.setSpeed(30);
+    pinMode(Step, OUTPUT); //Step pin as outaput
+    pinMode(Dire,  OUTPUT); //Direcction pin as output
+    pinMode(Sleep,  OUTPUT); //Set Sleep OUTPUT Control button as output
+    digitalWrite(Step, LOW); // Currently no stepper motor movement
+    digitalWrite(Dire, LOW);
+    
+    // Set target motor RPM to and microstepping setting
+    myStepper.begin(RPM, Microsteps);
+
     motor_state = {RELEASE,ARROW_UP};
 
     position_MAX = 300;
@@ -75,19 +83,16 @@ ErrorCode NEMA17Driver::saveMotorStatus() {
 }
 
 ErrorCode NEMA17Driver::motorLow()  {
-    digitalWrite(IN1, LOW);
-    digitalWrite(IN2, LOW);
-    digitalWrite(IN3, LOW);
-    digitalWrite(IN4, LOW);
+    digitalWrite(Sleep, LOW);
     vTaskDelay(10 / portTICK_PERIOD_MS);
     return E_OK;
 }
 
 ErrorCode NEMA17Driver::motorHigh() {
-
+    digitalWrite(Sleep, HIGH); 
     if(1 == motor_state.direction) {
         if(position < position_MAX) {
-            myStepper.step(stepper);
+            myStepper.rotate(stepper);
             position += stepper;
         }else {
             position = position_MAX;
@@ -98,7 +103,7 @@ ErrorCode NEMA17Driver::motorHigh() {
         
     }else if(0 == motor_state.direction) {
         if(position > position_MIN) {
-            myStepper.step(-stepper);
+            myStepper.rotate(-stepper);
             position -= stepper;
         }
         else {
