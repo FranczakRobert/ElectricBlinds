@@ -172,6 +172,7 @@ ErrorCode ESP32Server::setManager(DriverManager *drMg) {
 }
 
 void* ESP32Server::run(void* args) {
+  ESP32Server::GetInstance().driverManager->setDriverData(D_DISPLAY,S_OLED_SYSTEM_FULL_ACTIVE);
   while(ESP32Server::GetInstance().isRunning) {
     ESP32Server::server.handleClient();    
     vTaskDelay(10 / portTICK_PERIOD_MS);

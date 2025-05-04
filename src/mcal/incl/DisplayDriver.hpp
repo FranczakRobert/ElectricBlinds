@@ -14,6 +14,7 @@
 #define OLED_SYSTEM_ACTIVE_STATE 1
 #define OLED_SYSTEM_CONFIG_STATE 2
 #define OLED_SYSTEM_WIFI_DISCONNECTED 3
+#define OLED_SYSTEM_WIFI_CONNECTED 4
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels

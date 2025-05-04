@@ -23,6 +23,10 @@ ErrorCode DisplayDriver::init() {
     display.clearDisplay();
     display.setTextSize(1);             
     display.setTextColor(WHITE);   
+    display.setCursor(0, 35);
+    display.println("HELLO");
+    display.display();
+
     return E_OK;
 }
 
@@ -51,6 +55,12 @@ ErrorCode DisplayDriver::setData(DataSignals SIGNAL, uint16_t count, ...)
         case S_OLED_WIFI_DISCONNECTED:
             pthread_mutex_lock(&mutex);
             displayState = OLED_SYSTEM_WIFI_DISCONNECTED;
+            pthread_mutex_unlock(&mutex);
+        break;
+
+        case S_OLED_WIFI_CONNECTED:
+            pthread_mutex_lock(&mutex);
+            displayState = OLED_SYSTEM_WIFI_CONNECTED;
             pthread_mutex_unlock(&mutex);
         break;
 
@@ -96,19 +106,16 @@ void *DisplayDriver::run(void *args) {
                 self->display.clearDisplay();
                 self->display.setCursor(0, self->firstRow);
                 self->display.println("System:booting");
-
-                self->display.fillRect(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2, BLACK);
                 self->display.setCursor(0, self->secondRow);
                 self->display.println("WIFI:disconected");
-                self->display.display();            break;
+                self->display.display();            
+            break;
 
             case OLED_SYSTEM_CONFIG_STATE:
                 previousVal = OLED_SYSTEM_CONFIG_STATE;
                 self->display.clearDisplay();
                 self->display.setCursor(0, self->firstRow);
                 self->display.println("System:Config");
-
-                self->display.fillRect(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2, BLACK);
                 self->display.setCursor(0, self->secondRow);
                 self->display.println("WIFI:AP");
                 self->display.display();
@@ -122,8 +129,6 @@ void *DisplayDriver::run(void *args) {
                     self->display.clearDisplay();
                     self->display.setCursor(0, self->firstRow);
                     self->display.println("System: Active");
-
-                    self->display.fillRect(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2, BLACK);
                     self->display.setCursor(0, self->secondRow);
                     self->display.println("WIFI: connected");
                     self->display.display();
@@ -134,6 +139,13 @@ void *DisplayDriver::run(void *args) {
                 self->display.fillRect(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2, BLACK);
                 self->display.setCursor(0, self->secondRow);
                 self->display.println("WIFI:disconected");
+                self->display.display();
+            break;
+
+            case OLED_SYSTEM_WIFI_CONNECTED:
+                self->display.fillRect(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2, BLACK);
+                self->display.setCursor(0, self->secondRow);
+                self->display.println("WIFI:connected");
                 self->display.display();
             break;
 

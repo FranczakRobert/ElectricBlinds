@@ -125,7 +125,7 @@ void* WifiDriver::run(void* args) {
         }
         
         if(previousVal != WL_CONNECTED) {
-          self->driverManager->setDriverData(D_DISPLAY,S_OLED_SYSTEM_FULL_ACTIVE);
+          self->driverManager->setDriverData(D_DISPLAY,S_OLED_WIFI_CONNECTED);
           if(!wasEverConnected) {
             self->driverManager->setDriverData(D_SCHEDULER,S_SCHEDULER_FETCH_DATA);
           }
@@ -135,19 +135,20 @@ void* WifiDriver::run(void* args) {
         break;
       
       case WL_CONNECTION_LOST:
+        WiFi.reconnect();
         if(previousVal != WL_CONNECTION_LOST) {
           self->driverManager->setDriverData(D_DISPLAY,S_OLED_WIFI_DISCONNECTED);
-          WiFi.reconnect();
           previousVal = WL_CONNECTION_LOST;
         }
         break;
       
       case WL_NO_SSID_AVAIL:
         self->wifiStats.state = WIFI_CONFIG_MODE;
-        if(previousVal != WL_NO_SSID_AVAIL) {
-          self->driverManager->setDriverData(D_DISPLAY,S_OLED_SYSTEM_CONFIG_MODE);
-          previousVal = WL_NO_SSID_AVAIL;
-        }
+        self->driverManager->setDriverData(D_DISPLAY,S_OLED_SYSTEM_CONFIG_MODE);
+        // if(previousVal != WL_NO_SSID_AVAIL) {
+        //   self->driverManager->setDriverData(D_DISPLAY,S_OLED_SYSTEM_CONFIG_MODE);
+        //   previousVal = WL_NO_SSID_AVAIL;
+        // }
         self->getBlindsDataByAP();
         
         break;
@@ -233,13 +234,13 @@ ErrorCode WifiDriver::getBlindsDataByAP() {
 
             NvmMemory::getInstance().writeToNvm("CREDENTIALS","SSID",ssid);
             NvmMemory::getInstance().writeToNvm("CREDENTIALS","PSSWD",psswd);
-            driverManager->setDriverData(D_DISPLAY,S_OLED_SYSTEM_FULL_ACTIVE);
+            driverManager->setDriverData(D_DISPLAY,S_OLED_WIFI_CONNECTED);
             break;
           }
 
           if(WiFi.status() != WL_CONNECTED) {
             Serial.println("[Wifi][GetBlindsDataByAP] - contecting....");
-            driverManager->setDriverData(D_DISPLAY,S_OLED_SYSTEM_BOOT_STATE);
+            driverManager->setDriverData(D_DISPLAY,S_OLED_WIFI_DISCONNECTED);
               counter++;
               if(counter >= WIFI_RETRIES_MAX) {
                 doIHaveData = false;
