@@ -2,7 +2,7 @@
 #define DRIVER_MANAGER_HPP
 
 #include "ESP32Server.hpp"
-#include "LedDriver.hpp"
+#include "DisplayDriver.hpp"
 #include "WifiDriver.hpp"
 #include "NEMA17Driver.hpp"
 #include "Scheduler.hpp"
@@ -22,7 +22,7 @@ class DriverManager {
 
     private:
     WifiDriver wifiDriver = WifiDriver(this);
-    LedDriver ledDriver = LedDriver(this);
+    DisplayDriver displayDriver = DisplayDriver(this);
     NEMA17Driver stepperDriver = NEMA17Driver(this);
     Scheduler scheduler = Scheduler(this);
 

@@ -191,11 +191,11 @@ ErrorCode Scheduler::fetchHour()
     
   }
   else {
-    driverManager->setDriverData(D_LED,S_SET_LED_STATE_BOOT_MODE);
+    driverManager->setDriverData(D_DISPLAY,S_OLED_SYSTEM_BOOT_STATE);
     return E_NOT_OK;
   }
   
   http.end();
-  driverManager->setDriverData(D_LED,S_SET_LED_STATE_ACTIVE_MODE);
+  driverManager->setDriverData(D_DISPLAY,S_OLED_SYSTEM_FULL_ACTIVE);
   return E_OK;
   }

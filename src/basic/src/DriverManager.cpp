@@ -1,7 +1,7 @@
 #include "DriverManager.hpp"
 
 DriverManager::DriverManager() {
-    drivers_array[D_LED] = &ledDriver;
+    drivers_array[D_DISPLAY] = &displayDriver;
     drivers_array[D_WIFI] = &wifiDriver;
     drivers_array[D_NEMA17] = &stepperDriver;
     drivers_array[D_SCHEDULER] = &scheduler;

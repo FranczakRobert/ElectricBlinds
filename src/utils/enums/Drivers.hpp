@@ -4,7 +4,7 @@
 #define DRIVERS_NUMBER 4
 
 enum Drivers {
-    D_LED = 0,
+    D_DISPLAY = 0,
     D_SCHEDULER = 1,
     D_WIFI = 2,
     D_NEMA17 = 3,
@@ -13,13 +13,13 @@ enum Drivers {
 enum DataSignals {
     // WIFI
     S_GET_WIFI_STATUS = 0,
-    
-    //LED
     S_TRIGGER_RESET,
-    S_SET_WIFI_LED_OFF,
-    S_SET_LED_STATE_CONFIG_MODE,
-    S_SET_LED_STATE_BOOT_MODE,
-    S_SET_LED_STATE_ACTIVE_MODE,
+    
+    //OLED
+    S_OLED_WIFI_DISCONNECTED,
+    S_OLED_SYSTEM_CONFIG_MODE,
+    S_OLED_SYSTEM_BOOT_STATE,
+    S_OLED_SYSTEM_FULL_ACTIVE,
 
     //NEMA17
     S_SET_NEMA_UP_STATUS,

@@ -12,10 +12,8 @@ DriverManager driverManager;
 
 #define TEST 0
 
-void setup() {
-  
+void setup() {  
   Serial.begin(9600);
-  testDisplay();
   vTaskDelay(3000);
 
   if(!TEST) {
