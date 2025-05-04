@@ -95,7 +95,10 @@ ErrorCode Scheduler::init()
   
   setTimeClock(NEMAWorkingTime[NEMA_RAISING],raisingTime);
   setTimeClock(NEMAWorkingTime[NEMA_LOWERING],loweringTime);
-  
+
+  driverManager->setDriverData(D_DISPLAY,S_SET_OLED_LOWERING,1,loweringTime);
+  driverManager->setDriverData(D_DISPLAY,S_SET_OLED_RAISING,1,raisingTime);
+
   return E_OK;
 }
 
@@ -152,6 +155,7 @@ ErrorCode Scheduler::setData(DataSignals SIGNAL, uint16_t count, ...)
         pthread_mutex_lock(&mutex);
         setTimeClock(NEMAWorkingTime[NEMA_LOWERING], String(va_arg(args, const char*)));
         pthread_mutex_unlock(&mutex);
+        va_end(args);
       }
     break;
 
@@ -162,6 +166,7 @@ ErrorCode Scheduler::setData(DataSignals SIGNAL, uint16_t count, ...)
         pthread_mutex_lock(&mutex);
         setTimeClock(NEMAWorkingTime[NEMA_RAISING], String(va_arg(args, const char*)));
         pthread_mutex_unlock(&mutex);
+        va_end(args);
       }
     break;
 
@@ -191,11 +196,11 @@ ErrorCode Scheduler::fetchHour()
     
   }
   else {
-    // driverManager->setDriverData(D_DISPLAY,S_OLED_SYSTEM_BOOT_STATE);
+
     return E_NOT_OK;
   }
   
   http.end();
-  // driverManager->setDriverData(D_DISPLAY,S_OLED_SYSTEM_FULL_ACTIVE);
+  driverManager->setDriverData(D_DISPLAY,S_OLED_TIME_DISPLAY);
   return E_OK;
   }

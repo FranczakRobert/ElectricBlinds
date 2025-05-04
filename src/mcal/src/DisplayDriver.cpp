@@ -13,7 +13,7 @@ DisplayDriver::~DisplayDriver() {
 }
 
 ErrorCode DisplayDriver::init() {
-    Serial.begin(115200);
+    // Serial.begin(115200);
     if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { 
         Serial.println("SSD1306 allocation failed");
         for(;;);
@@ -81,6 +81,31 @@ ErrorCode DisplayDriver::setData(DataSignals SIGNAL, uint16_t count, ...)
             displayState = OLED_SYSTEM_ACTIVE_STATE;
             pthread_mutex_unlock(&mutex);
         break;
+
+        case S_SET_OLED_LOWERING:
+            if(count > 0) {
+                va_list args;
+                va_start(args, count);
+                low = String(va_arg(args, const char*));
+                Serial.println(low);
+                va_end(args);            
+            }
+        break;
+
+        case S_SET_OLED_RAISING:
+            if(count > 0) {
+                va_list args;
+                va_start(args, count);
+                rais = String(va_arg(args, const char*));
+                Serial.println(rais);
+                va_end(args);            
+            }
+        break;
+
+        case S_OLED_TIME_DISPLAY:
+            pthread_mutex_lock(&mutex);
+            displayState = OLED_SYSTEM_TIME_ACTIVE;
+            pthread_mutex_unlock(&mutex);
         
         default:
             break;
@@ -106,8 +131,6 @@ void *DisplayDriver::run(void *args) {
                 self->display.clearDisplay();
                 self->display.setCursor(0, self->firstRow);
                 self->display.println("System:booting");
-                self->display.setCursor(0, self->secondRow);
-                self->display.println("WIFI:disconected");
                 self->display.display();            
             break;
 
@@ -115,9 +138,9 @@ void *DisplayDriver::run(void *args) {
                 previousVal = OLED_SYSTEM_CONFIG_STATE;
                 self->display.clearDisplay();
                 self->display.setCursor(0, self->firstRow);
-                self->display.println("System:Config");
+                self->display.println("System: Config");
                 self->display.setCursor(0, self->secondRow);
-                self->display.println("WIFI:AP");
+                self->display.println("WIFI: AP");
                 self->display.display();
             break;
 
@@ -129,24 +152,35 @@ void *DisplayDriver::run(void *args) {
                     self->display.clearDisplay();
                     self->display.setCursor(0, self->firstRow);
                     self->display.println("System: Active");
-                    self->display.setCursor(0, self->secondRow);
-                    self->display.println("WIFI: connected");
                     self->display.display();
                 }
             break;
 
             case OLED_SYSTEM_WIFI_DISCONNECTED:
-                self->display.fillRect(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2, BLACK);
+                self->display.fillRect(0, self->secondRow - 10, SCREEN_WIDTH, 16, BLACK);
                 self->display.setCursor(0, self->secondRow);
-                self->display.println("WIFI:disconected");
+                self->display.println("wifi:disconected");
                 self->display.display();
             break;
 
             case OLED_SYSTEM_WIFI_CONNECTED:
-                self->display.fillRect(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2, BLACK);
+                self->display.fillRect(0, self->secondRow - 10, SCREEN_WIDTH, 16, BLACK);
                 self->display.setCursor(0, self->secondRow);
-                self->display.println("WIFI:connected");
+                self->display.println("wifi:connected");
                 self->display.display();
+            break;
+
+            case OLED_SYSTEM_TIME_ACTIVE:
+            self->display.clearDisplay();
+            self->display.setCursor(0, self->firstRow);
+            self->display.println("low :  " + self->low);
+
+            self->display.setCursor(0, self->secondRow);
+            self->display.println("rais :  " + self->rais);
+
+            self->display.setCursor(0, self->thirdRow);
+            self->display.println("Wifi: ok Sys:ok");
+            self->display.display();
             break;
 
             default:

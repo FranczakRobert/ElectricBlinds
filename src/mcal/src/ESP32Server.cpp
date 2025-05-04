@@ -79,6 +79,10 @@ void ESP32Server::handleBlindsTimerPost() {
       D_SCHEDULER,
       S_SCHEDULER_SET_NEMA_UP_TIME,1,raisingTime);
 
+    ESP32Server::GetInstance().driverManager->setDriverData(D_DISPLAY,S_SET_OLED_RAISING,1,String(raisingTime));
+    ESP32Server::GetInstance().driverManager->setDriverData(D_DISPLAY,S_SET_OLED_LOWERING,1,String(loweringTime));
+    ESP32Server::GetInstance().driverManager->setDriverData(D_DISPLAY,S_OLED_TIME_DISPLAY);
+
   }
 }
 
@@ -92,7 +96,7 @@ void ESP32Server::setRandLTimers() {
   String loweringTimeVal = NvmMemory::getInstance().readFromNvm("TIME", "L");
   String raisingTimeVal = NvmMemory::getInstance().readFromNvm("TIME", "R");
   pthread_mutex_unlock(&timeValMutex);
-  
+
     JsonDocument doc;
     doc["loweringTime"] = loweringTimeVal.isEmpty() ? "00:00" : loweringTimeVal;
     doc["raisingTime"] = raisingTimeVal.isEmpty() ? "00:00" : raisingTimeVal;
