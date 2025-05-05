@@ -135,22 +135,19 @@ void* WifiDriver::run(void* args) {
         break;
       
       case WL_CONNECTION_LOST:
-        WiFi.reconnect();
+        
         if(previousVal != WL_CONNECTION_LOST) {
           self->driverManager->setDriverData(D_DISPLAY,S_OLED_WIFI_DISCONNECTED);
           previousVal = WL_CONNECTION_LOST;
         }
+        WiFi.reconnect();
         break;
       
       case WL_NO_SSID_AVAIL:
         self->wifiStats.state = WIFI_CONFIG_MODE;
         self->driverManager->setDriverData(D_DISPLAY,S_OLED_SYSTEM_CONFIG_MODE);
-        // if(previousVal != WL_NO_SSID_AVAIL) {
-        //   self->driverManager->setDriverData(D_DISPLAY,S_OLED_SYSTEM_CONFIG_MODE);
-        //   previousVal = WL_NO_SSID_AVAIL;
-        // }
+
         self->getBlindsDataByAP();
-        
         break;
       
       default:
@@ -234,7 +231,8 @@ ErrorCode WifiDriver::getBlindsDataByAP() {
 
             NvmMemory::getInstance().writeToNvm("CREDENTIALS","SSID",ssid);
             NvmMemory::getInstance().writeToNvm("CREDENTIALS","PSSWD",psswd);
-            driverManager->setDriverData(D_DISPLAY,S_OLED_WIFI_CONNECTED);
+            driverManager->setDriverData(D_DISPLAY,S_OLED_SYSTEM_FULL_ACTIVE);
+
             break;
           }
 

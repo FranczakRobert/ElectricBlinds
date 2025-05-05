@@ -5,7 +5,7 @@ DisplayDriver::DisplayDriver(DriverManager *driverManager)
 :display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1)
 {
     this->driverManager = driverManager;
-    TAG = "LED";
+    TAG = "Display";
 }
 
 DisplayDriver::~DisplayDriver() {
@@ -127,21 +127,27 @@ void *DisplayDriver::run(void *args) {
 
         switch (displayState) {
             case OLED_SYSTEM_BOOT_STATE:
-                previousVal = OLED_SYSTEM_BOOT_STATE;
                 self->display.clearDisplay();
                 self->display.setCursor(0, self->firstRow);
                 self->display.println("System:booting");
-                self->display.display();            
+                if(previousVal != OLED_SYSTEM_BOOT_STATE) {
+                    vTaskDelay(10/portTICK_PERIOD_MS);
+                    previousVal = OLED_SYSTEM_BOOT_STATE;
+                    self->display.display();
+                }
             break;
 
             case OLED_SYSTEM_CONFIG_STATE:
-                previousVal = OLED_SYSTEM_CONFIG_STATE;
                 self->display.clearDisplay();
                 self->display.setCursor(0, self->firstRow);
                 self->display.println("System: Config");
                 self->display.setCursor(0, self->secondRow);
                 self->display.println("WIFI: AP");
-                self->display.display();
+                if(previousVal != OLED_SYSTEM_CONFIG_STATE) {
+                    vTaskDelay(10/portTICK_PERIOD_MS);
+                    previousVal = OLED_SYSTEM_CONFIG_STATE;
+                    self->display.display();
+                }
             break;
 
             case OLED_SYSTEM_ACTIVE_STATE:
@@ -157,30 +163,44 @@ void *DisplayDriver::run(void *args) {
             break;
 
             case OLED_SYSTEM_WIFI_DISCONNECTED:
-                self->display.fillRect(0, self->secondRow - 10, SCREEN_WIDTH, 16, BLACK);
+                self->display.clearDisplay();
+                self->display.setCursor(0, self->firstRow);
+                self->display.println("System: Active");
                 self->display.setCursor(0, self->secondRow);
                 self->display.println("wifi:disconected");
-                self->display.display();
+                if(previousVal != OLED_SYSTEM_WIFI_DISCONNECTED) {
+                    vTaskDelay(10/portTICK_PERIOD_MS);
+                    previousVal = OLED_SYSTEM_WIFI_DISCONNECTED;
+                    self->display.display();
+                }
             break;
 
             case OLED_SYSTEM_WIFI_CONNECTED:
                 self->display.fillRect(0, self->secondRow - 10, SCREEN_WIDTH, 16, BLACK);
                 self->display.setCursor(0, self->secondRow);
                 self->display.println("wifi:connected");
-                self->display.display();
+                if(previousVal != OLED_SYSTEM_WIFI_CONNECTED) {
+                    vTaskDelay(10/portTICK_PERIOD_MS);
+                    previousVal = OLED_SYSTEM_WIFI_CONNECTED;
+                    self->display.display();
+                }
             break;
 
             case OLED_SYSTEM_TIME_ACTIVE:
-            self->display.clearDisplay();
-            self->display.setCursor(0, self->firstRow);
-            self->display.println("low :  " + self->low);
+                self->display.clearDisplay();
+                self->display.setCursor(0, self->firstRow);
+                self->display.println("low :  " + self->low);
 
-            self->display.setCursor(0, self->secondRow);
-            self->display.println("rais :  " + self->rais);
+                self->display.setCursor(0, self->secondRow);
+                self->display.println("rais :  " + self->rais);
 
-            self->display.setCursor(0, self->thirdRow);
-            self->display.println("Wifi: ok Sys:ok");
-            self->display.display();
+                self->display.setCursor(0, self->thirdRow);
+                self->display.println("Wifi: ok Sys:ok");
+                if(previousVal != OLED_SYSTEM_TIME_ACTIVE) {
+                    vTaskDelay(10/portTICK_PERIOD_MS);
+                    previousVal = OLED_SYSTEM_TIME_ACTIVE;
+                    self->display.display();
+                }
             break;
 
             default:
