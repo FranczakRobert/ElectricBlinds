@@ -62,17 +62,23 @@ package "MCAL" <<Folder>> #DDDDDD{
         -{static} timeValMutex: pthread_mutex_t
     }
 
-    class LedDriver #lightblue {
-        -ledState: uint8_t
-        +LedDriver()
-        +~LedDriver()
+    class DisplayDriver #lightblue {
+        -displayState: uint16_t
+        -firstRow: uint16_t
+        -secondRow: uint16_t
+        -thirdRow: uint16_t
+        -low: String
+        -rais: String
+        -display: Adafruit_SSD1306
+
+        +DisplayDriver()
+        +~DisplayDriver()
         +start():ErrorCode <<override>>
         +stop():ErrorCode <<override>>
         -init():ErrorCode <<override>>
         -deinit():ErrorCode <<override>>
         +getData(DataSignals):DataSignalsResponse <<override>>
         +setData(DataSignals SIGNAL, uint16_t count, ...):ErrorCode <<override>>
-        -blinkSystem(uint32_t time, bool isActive = false):void
         #{static} run(void* args):void*
     }
 
@@ -131,7 +137,7 @@ package "Utils" <<Folder>> #DDDDDD{
     package "ENUMS" <<Folder>> #FFF9C4 {
 
         enum Drivers {
-            D_LED
+            D_DISPLAY
             D_SCHEDULER
             D_WIFI
             D_NEMA17
@@ -140,10 +146,14 @@ package "Utils" <<Folder>> #DDDDDD{
         enum DataSignals {
             S_GET_WIFI_STATUS
             S_TRIGGER_RESET
-            S_SET_WIFI_LED_OFF
-            S_SET_LED_STATE_CONFIG_MODE
-            S_SET_LED_STATE_BOOT_MODE
-            S_SET_LED_STATE_ACTIVE_MODE
+            S_OLED_WIFI_DISCONNECTED
+            S_OLED_WIFI_CONNECTED
+            S_OLED_SYSTEM_CONFIG_MODE
+            S_OLED_SYSTEM_BOOT_STATE
+            S_OLED_SYSTEM_FULL_ACTIVE
+            S_OLED_TIME_DISPLAY
+            S_SET_OLED_RAISING
+            S_SET_OLED_LOWERING
             S_SET_NEMA_UP_STATUS
             S_SET_NEMA_DOWN_STATUS
             S_SET_NEMA_HOLD_STATUS
@@ -194,7 +204,7 @@ package "Basic" <<Folder>> #DDDDDD    {
         +setDriverData(driver: Drivers, signal: DataSignals, count: u16_t, ...) : ErrorCode
 
         - wifiDriver: WifiDriver
-        - ledDriver:LedDriver
+        - displayDriver:DisplayDriver
         - stepperDriver:NEMA17Driver
         - scheduler: Scheduler
         -drivers_array[]: Driver*
@@ -230,8 +240,8 @@ MCAL.NEMA17Driver -|> MCAL.Abstract.Thread
 MCAL.ESP32Server -|> MCAL.Abstract.Driver
 MCAL.ESP32Server -|> MCAL.Abstract.Thread
 
-MCAL.LedDriver -|> MCAL.Abstract.Driver
-MCAL.LedDriver -|> MCAL.Abstract.Thread
+MCAL.DisplayDriver -|> MCAL.Abstract.Driver
+MCAL.DisplayDriver -|> MCAL.Abstract.Thread
 
 Basic.Scheduler -|> MCAL.Abstract.Driver
 Basic.Scheduler -|> MCAL.Abstract.Thread
@@ -247,7 +257,7 @@ MCAL.NEMA17Driver --> Utils.NvmMemory
 MCAL.ESP32Server --> Utils.NvmMemory
 
 Basic.DriverManager --> MCAL.ESP32Server
-Basic.DriverManager --> MCAL.LedDriver
+Basic.DriverManager --> MCAL.DisplayDriver
 Basic.DriverManager --> MCAL.WifiDriver
 Basic.DriverManager --> MCAL.NEMA17Driver
 Basic.DriverManager --> Basic.Scheduler
