@@ -437,6 +437,24 @@ const String configPage = R"rawliteral(
   </div>
 
   <script>
+  let credentials = null;
+
+    window.addEventListener('DOMContentLoaded', () => {
+        if (!credentials) {
+        fetch('/getWifiCred')
+          .then(response => response.text())
+          .then(text => {
+            console.log("Raw response text:", text);
+            const data = JSON.parse(text); // ręcznie próbujemy sparsować
+            console.log("Parsed data:", data);
+            document.getElementById('ssid').value = data.login;
+            document.getElementById('password').value = data.pswd;
+          })
+  .catch(error => console.error('Error:', error));
+
+        }
+    });
+
     function sendData() {
       var ssid = document.getElementById('ssid').value;
       var password = document.getElementById('password').value;

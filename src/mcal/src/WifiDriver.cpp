@@ -191,6 +191,37 @@ ErrorCode WifiDriver::getBlindsDataByAP() {
         if (client.available()) {
           char c = client.read();
           header += c;
+
+          if (header.startsWith("GET /getWifiCred")) {
+            client.println("HTTP/1.1 200 OK");
+            client.println("Content-Type: application/json");
+            client.println("Connection: close");
+            client.println();
+            
+           pthread_mutex_lock(&mutex);
+            String wifiName = NvmMemory::getInstance().readFromNvm("CREDENTIALS", "SSID");
+            String psswd = NvmMemory::getInstance().readFromNvm("CREDENTIALS", "PSSWD");
+            pthread_mutex_unlock(&mutex);
+
+            JsonDocument doc;
+            doc["login"] = wifiName.isEmpty() ? "" : wifiName;
+            doc["pswd"] = psswd.isEmpty() ? "" : psswd;
+
+            Serial.println(wifiName);
+            Serial.println(psswd);
+
+            
+
+            String json;
+            serializeJson(doc, json);
+            client.println(json);
+
+            Serial.println(json);
+            client.flush();
+            client.stop();
+            continue;
+          }
+
           
           if (header.endsWith("\r\n\r\n")) {
             if (header.startsWith("POST")) {

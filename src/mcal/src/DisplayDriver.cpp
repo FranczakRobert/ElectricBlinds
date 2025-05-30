@@ -192,7 +192,7 @@ void *DisplayDriver::run(void *args) {
                 self->display.println("DOWN :  " + self->low);
 
                 self->display.setCursor(0, self->secondRow);
-                self->display.println("UP   :  " + self->rais);
+                self->display.println("UP        :  " + self->rais);
 
                 self->display.setCursor(0, self->thirdRow);
                 self->display.println("Wifi: V Sys: V");
