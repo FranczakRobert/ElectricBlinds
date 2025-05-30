@@ -16,7 +16,7 @@ ErrorCode DisplayDriver::init() {
     // Serial.begin(115200);
     if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { 
         Serial.println("SSD1306 allocation failed");
-        for(;;);
+        return E_NOT_OK;
     }
     delay(1000);
     display.setFont(&FreeSerif9pt7b);
@@ -167,7 +167,7 @@ void *DisplayDriver::run(void *args) {
                 self->display.setCursor(0, self->firstRow);
                 self->display.println("System: Active");
                 self->display.setCursor(0, self->secondRow);
-                self->display.println("wifi:disconected");
+                self->display.println("wifi: lost");
                 if(previousVal != OLED_SYSTEM_WIFI_DISCONNECTED) {
                     vTaskDelay(10/portTICK_PERIOD_MS);
                     previousVal = OLED_SYSTEM_WIFI_DISCONNECTED;
@@ -189,18 +189,16 @@ void *DisplayDriver::run(void *args) {
             case OLED_SYSTEM_TIME_ACTIVE:
                 self->display.clearDisplay();
                 self->display.setCursor(0, self->firstRow);
-                self->display.println("low :  " + self->low);
+                self->display.println("DOWN :  " + self->low);
 
                 self->display.setCursor(0, self->secondRow);
-                self->display.println("rais :  " + self->rais);
+                self->display.println("UP   :  " + self->rais);
 
                 self->display.setCursor(0, self->thirdRow);
-                self->display.println("Wifi: ok Sys:ok");
-                if(previousVal != OLED_SYSTEM_TIME_ACTIVE) {
-                    vTaskDelay(10/portTICK_PERIOD_MS);
-                    previousVal = OLED_SYSTEM_TIME_ACTIVE;
-                    self->display.display();
-                }
+                self->display.println("Wifi: V Sys: V");
+                vTaskDelay(10/portTICK_PERIOD_MS);
+                previousVal = OLED_SYSTEM_TIME_ACTIVE;
+                self->display.display();
             break;
 
             default:

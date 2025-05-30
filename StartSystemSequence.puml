@@ -1,0 +1,51 @@
+@startuml
+title DriverManager Init & Start Flow
+
+actor System
+System -> DriverManager : initAllDrivers()
+activate DriverManager
+participant Driver as "drivers_array[ ]"
+
+alt Driver init loop
+    loop for each driver in drivers_array
+        DriverManager -> Driver : init()
+        alt init() == E_OK
+            DriverManager --> DriverManager : continue
+        else init() == E_NOT_OK
+            DriverManager -> SerialConsole : log init failed
+            DriverManager --> System : return E_NOT_OK
+            deactivate DriverManager
+        end
+    end
+end
+
+DriverManager -> ESP32Server : GetInstance().setManager(this)
+DriverManager --> System : return E_OK
+deactivate DriverManager
+
+alt initAllDrivers() == E_OK
+    System -> DriverManager : startAllDrivers()
+    activate DriverManager
+
+    alt Driver start loop
+        loop for each driver in drivers_array
+            DriverManager -> Driver : start()
+            alt start() == E_OK
+                DriverManager --> DriverManager : continue
+            else start() == E_NOT_OK
+                DriverManager -> SerialConsole : log start failed
+                DriverManager --> System : return E_NOT_OK
+                deactivate DriverManager
+            end
+        end
+    end
+
+    DriverManager -> ESP32Server : GetInstance().start()
+    DriverManager --> System : return E_OK
+    deactivate DriverManager
+
+else
+    System -> SerialConsole : log init failed
+end
+
+@enduml

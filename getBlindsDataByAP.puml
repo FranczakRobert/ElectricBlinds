@@ -1,0 +1,68 @@
+@startuml
+title Sekwencja: WifiDriver::getBlindsDataByAP()
+
+actor "WifiDriver" as WD
+participant "WiFi" as WiFi
+participant "DNSServer" as DNS
+participant "WiFiServer" as Server
+participant "WiFiClient" as Client
+participant "JsonDocument" as JSON
+participant "NvmMemory" as NVM
+participant "DriverManager" as DM
+
+== Start trybu Access Point ==
+
+WD -> WiFi : softAP("Home-Rolety", NULL)
+WD -> WiFi : softAPConfig(...)
+WD -> DNS : start(53, "*", 192.168.4.1)
+WD -> Server : begin()
+
+loop while (isRunning && !doIHaveData)
+
+    DNS -> DNS : processNextRequest()
+    Server -> Client : available()
+
+    alt client connected
+        loop while client.connected()
+            Client -> WD : read header chars
+        end
+        alt is POST
+            
+            Client -> WD : read()
+            WD -> JSON : deserializeJson(postData)
+            JSON --> WD : ssid, password, max
+            WD -> WiFi : begin(ssid, password)
+            WD -> WD : doIHaveData = "true";
+            loop while doIHaveData
+                WiFi -> WD : status()
+                alt WiFi connected
+                    WD -> Client : flush(), stop()
+                    WD -> Server : close()
+                    WD -> WiFi : softAPdisconnect()
+
+                    WD -> DM : setDriverData(D_NEMA17, S_SET_NEMA_MAX, max)
+                    WD -> NVM : writeToNvm("CREDENTIALS", "SSID", ssid)
+                    WD -> NVM : writeToNvm("CREDENTIALS", "PSSWD", password)
+                    WD -> DM : setDriverData(D_DISPLAY, S_OLED_SYSTEM_FULL_ACTIVE)
+                    break
+
+                else
+                WD -> WD : counter++;
+                    alt counter >= WIFI_RETRIES_MAX
+                        WD -> DM : setDriverData(D_DISPLAY, S_OLED_WIFI_DISCONNECTED)
+                        WD -> WD : doIHaveData = "false";
+                    end
+                end
+            end
+        end 
+            Client -> WD : println(HTTP 200 + configPage)
+            Client -> Client : flush()
+            Client -> Client : stop()
+        
+    end
+end
+
+WD --> WD : E_OK
+
+@enduml
+

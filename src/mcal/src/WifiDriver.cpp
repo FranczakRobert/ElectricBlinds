@@ -125,9 +125,13 @@ void* WifiDriver::run(void* args) {
         }
         
         if(previousVal != WL_CONNECTED) {
-          self->driverManager->setDriverData(D_DISPLAY,S_OLED_WIFI_CONNECTED);
+
           if(!wasEverConnected) {
+            self->driverManager->setDriverData(D_DISPLAY,S_OLED_WIFI_CONNECTED);
             self->driverManager->setDriverData(D_SCHEDULER,S_SCHEDULER_FETCH_DATA);
+          }
+          else {
+            self->driverManager->setDriverData(D_DISPLAY,S_OLED_SYSTEM_FULL_ACTIVE);
           }
           previousVal = WL_CONNECTED;
         }

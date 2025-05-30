@@ -1,0 +1,60 @@
+@startuml
+title Sekwencja działania WifiDriver
+
+actor System
+participant "WifiDriver" as WD
+participant "WiFi" as WiFi
+participant "NvmMemory" as NVM
+participant "DriverManager" as DM
+participant "DNSServer" as DNS
+participant "WiFiServer" as Server
+participant "Client" as Client
+
+== Inicjalizacja WiFi ==
+
+System -> WD : init()
+WD -> NVM : readFromNvm("CREDENTIALS", "SSID")
+NVM --> WD : ssid
+WD -> NVM : readFromNvm("CREDENTIALS", "PSSWD")
+NVM --> WD : psswd
+
+WD -> WiFi : begin(ssid, psswd)
+
+WD --> System : E_OK
+
+== Start watku ==
+
+System -> WD : start()
+WD -> WD : startThread(TAG, this, run, true)
+
+== Wątek run() ==
+
+loop while isRunning
+    WD -> WiFi : status()
+    WiFi -> WD : status
+    alt status == WL_DISCONNECTED
+        WD -> WD :counter++;
+        WD -> DM : setDriverData(D_DISPLAY, S_OLED_WIFI_DISCONNECTED)
+        alt counter == 8
+            WiFi -> WiFi : WiFi._setStatus(WL_NO_SSID_AVAIL)
+            WD -> WD : counter = 0
+        else
+            WD -> WD :counter++;
+        end
+    else status == WL_CONNECTED
+        WD -> WD : counter = 0
+        WD -> DM : setDriverData(D_DISPLAY, S_OLED_WIFI_CONNECTED)
+        opt !wasEverConnected
+            WD -> DM : setDriverData(D_SCHEDULER, S_SCHEDULER_FETCH_DATA)
+        end
+    else status == WL_CONNECTION_LOST
+        WD -> DM : setDriverData(D_DISPLAY,S_OLED_WIFI_DISCONNECTED)
+        WD -> WiFi : WiFi.reconnect()
+    else status == WL_NO_SSID_AVAIL
+        WD -> DM : setDriverData(D_DISPLAY, S_OLED_SYSTEM_CONFIG_MODE)
+        WD -> WD : getBlindsDataByAP()
+    end
+end
+WD -> WiFi:   WiFi.disconnect()
+
+@enduml
